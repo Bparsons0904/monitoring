@@ -1,0 +1,28 @@
+kind: pipeline
+type: docker
+name: monitoring-deploy
+
+steps:
+  - name: deploy
+    image: docker:latest
+    commands:
+      - docker compose down || true
+      - docker compose pull
+      - docker compose up -d
+      - sleep 15
+      - docker compose ps
+    environment:
+      GRAFANA_ADMIN_USER:
+        from_secret: GRAFANA_ADMIN_USER
+      GRAFANA_ADMIN_PASSWORD:
+        from_secret: GRAFANA_ADMIN_PASSWORD
+      VM_AUTH_USERNAME:
+        from_secret: VM_AUTH_USERNAME
+      VM_AUTH_PASSWORD:
+        from_secret: VM_AUTH_PASSWORD
+
+trigger:
+  branch:
+    - main
+  event:
+    - push

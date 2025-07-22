@@ -1,0 +1,95 @@
+services:
+  vmauth:
+    image: victoriametrics/vmauth:latest
+    container_name: vmauth
+    volumes:
+      - ./configs/vmauth-config.yml:/etc/vmauth/config.yml:ro
+    command:
+      - "--auth.config=/etc/vmauth/config.yml"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vmauth.rule=Host(`metrics.bobparsons.dev`)"
+      - "traefik.http.routers.vmauth.entrypoints=https"
+      - "traefik.http.routers.vmauth.tls.certresolver=letsencrypt"
+      - "traefik.http.services.vmauth.loadbalancer.server.port=8427"
+      - "traefik.docker.network=traefik"
+    networks:
+      - monitoring
+      - traefik
+    restart: unless-stopped
+    depends_on:
+      - victoriametrics
+
+  victoriametrics:
+    image: victoriametrics/victoria-metrics:latest
+    container_name: victoriametrics
+    volumes:
+      - ./configs/vm-scrape-config.yaml:/etc/victoria-metrics/scrape-config.yaml:ro
+      - vm_data:/victoria-metrics-data
+    command:
+      - "-promscrape.config=/etc/victoria-metrics/scrape-config.yaml"
+      - "-storageDataPath=/victoria-metrics-data"
+      - "-httpListenAddr=:8428"
+      - "-retentionPeriod=12" # 12 months retention
+    networks:
+      - monitoring
+      - traefik
+    restart: unless-stopped
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command:
+      - "--path.procfs=/host/proc"
+      - "--path.sysfs=/host/sys"
+      - "--path.rootfs=/rootfs"
+      - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
+      - "--collector.docker"
+      - "--web.listen-address=:9100"
+    networks:
+      - monitoring
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./configs/grafana/provisioning:/etc/grafana/provisioning:ro
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+      - GF_SERVER_DOMAIN=grafana.bobparsons.dev
+      - GF_SERVER_ROOT_URL=https://grafana.bobparsons.dev
+      - GF_SECURITY_COOKIE_SECURE=true
+      - GF_SECURITY_ALLOW_EMBEDDING=false
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_INSTALL_PLUGINS=grafana-clock-panel
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.grafana.rule=Host(`grafana.bobparsons.dev`)"
+      - "traefik.http.routers.grafana.entrypoints=https"
+      - "traefik.http.routers.grafana.tls.certresolver=letsencrypt"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
+      - "traefik.docker.network=traefik"
+    networks:
+      - monitoring
+      - traefik
+    restart: unless-stopped
+
+networks:
+  monitoring:
+    driver: bridge
+  traefik:
+    external: true
+
+volumes:
+  vm_data:
+    driver: local
+  grafana_data:
+    driver: local

@@ -1,0 +1,16 @@
+users:
+  # Admin user with full read/write access
+  - username: "${VM_AUTH_USERNAME}"
+    password: "${VM_AUTH_PASSWORD}"
+    url_prefix: "http://victoriametrics:8428"
+
+  # Optional: Read-only user for dashboards/monitoring tools
+  # - username: "${VM_AUTH_READONLY_USERNAME}"
+  #   password: "${VM_AUTH_READONLY_PASSWORD}"
+  #   url_prefix: "http://victoriametrics:8428"
+  #   headers:
+  #     - "X-Forwarded-User: readonly"
+# Optional: IP-based access control
+# unauthorized_user:
+#   url_prefix: "http://victoriametrics:8428"
+#   src_ips: ["127.0.0.1"]
