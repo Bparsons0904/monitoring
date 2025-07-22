@@ -71,10 +71,10 @@ Set in `.env` file based on `.env.example`:
 
 ## CI/CD Integration
 
-### Drone Pipeline
-Automated deployment triggered on main branch pushes:
+### Drone Pipeline (Currently Disabled)
+Drone CI has been disabled (`.drone.yml.disabled`) in favor of manual deployment:
 ```bash
-# Manual deployment commands (equivalent to Drone pipeline)
+# Manual deployment commands
 docker compose down || true
 docker compose pull
 docker compose up -d
@@ -83,26 +83,26 @@ docker compose ps
 ```
 
 ### Secrets Management
-Drone pipeline expects these secrets to be configured:
-- `GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD`
-- `VM_AUTH_USERNAME` / `VM_AUTH_PASSWORD`
+Environment variables are managed through `.env` file:
+- `GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD`: Grafana admin credentials
+- `VM_AUTH_USERNAME` / `VM_AUTH_PASSWORD`: VictoriaMetrics authentication
 
 ## Development Workflow
 
 ### Local Development
 1. Copy `.env.example` to `.env` and configure credentials
 2. Start services: `docker compose up -d`
-3. Access Grafana at `http://localhost:3000` (or configured domain)
-4. VictoriaMetrics available through VMAuth on port 8427
+3. Access Grafana at `https://grafana.bobparsons.dev`
+4. VictoriaMetrics available through VMAuth at `https://metrics.bobparsons.dev`
 
 ### Configuration Changes
 - VMAuth config changes: Edit `configs/vmauth-config.yml` and restart vmauth service
 - Service changes: Edit `docker-compose.yml` and run `docker compose up -d`
 
 ### Monitoring Access
-- Grafana: External domain with SSL (production) or localhost:3000 (development)
-- VictoriaMetrics: Accessible through VMAuth proxy with authentication
-- Node Exporter: Internal metrics collection on port 9100
+- Grafana: `https://grafana.bobparsons.dev` (SSL via Traefik/Let's Encrypt)
+- VictoriaMetrics: `https://metrics.bobparsons.dev` (VMAuth proxy with authentication)
+- Node Exporter: Internal metrics collection on port 9100 (monitoring network only)
 
 ## Security Considerations
 
@@ -110,3 +110,32 @@ Drone pipeline expects these secrets to be configured:
 - SSL termination handled by Traefik with Let's Encrypt certificates
 - Sensitive credentials managed through environment variables and CI/CD secrets
 - Docker socket mounted read-only for container metrics collection
+
+## Troubleshooting
+
+### SSL Certificate Issues
+If Let's Encrypt rate limiting occurs (5 failed authorizations per hour):
+```bash
+# Check Traefik logs for rate limit errors
+docker logs traefik --tail=20
+
+# Wait for rate limit window to reset (1 hour from first failure)
+# Then restart services to retry certificate generation
+docker compose up -d
+```
+
+### Configuration Issues Fixed
+- **VictoriaMetrics**: Removed unsupported `evaluation_interval` from scrape config
+- **Node Exporter**: Removed unsupported `--collector.docker` flag
+- **Environment**: Use `.env` file instead of CI/CD secrets
+
+### Service Status Check
+```bash
+# Verify all services running
+docker compose ps
+
+# Check individual service logs
+docker compose logs victoriametrics
+docker compose logs grafana
+docker compose logs vmauth
+```

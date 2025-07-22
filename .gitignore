@@ -1,0 +1,22 @@
+# Environment variables
+.env
+
+# Docker volumes
+vm_data/
+grafana_data/
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
