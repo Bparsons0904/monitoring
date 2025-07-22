@@ -4,7 +4,7 @@ name: monitoring-deploy
 
 steps:
   - name: deploy
-    image: docker:latest
+    image: docker/compose:latest
     volumes:
       - name: monitoring-deploy
         path: /home/server/monitoring
@@ -12,11 +12,12 @@ steps:
       - mkdir -p /home/server/monitoring
       - cp -r . /home/server/monitoring/
       - cd /home/server/monitoring
-      - docker compose down || true
-      - docker compose pull
-      - docker compose up -d
+      - ls -la configs/
+      - docker-compose down || true
+      - docker-compose pull
+      - docker-compose up -d
       - sleep 15
-      - docker compose ps
+      - docker-compose ps
     environment:
       GRAFANA_ADMIN_USER:
         from_secret: GRAFANA_ADMIN_USER
