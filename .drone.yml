@@ -5,7 +5,15 @@ name: monitoring-deploy
 steps:
   - name: deploy
     image: docker:latest
+    volumes:
+      - name: docker-sock
+        path: /var/run/docker.sock
+      - name: monitoring-deploy
+        path: /home/server/monitoring
     commands:
+      - mkdir -p /home/server/monitoring
+      - cp -r . /home/server/monitoring/
+      - cd /home/server/monitoring
       - docker compose down || true
       - docker compose pull
       - docker compose up -d
@@ -20,6 +28,14 @@ steps:
         from_secret: VM_AUTH_USERNAME
       VM_AUTH_PASSWORD:
         from_secret: VM_AUTH_PASSWORD
+
+volumes:
+  - name: docker-sock
+    host:
+      path: /var/run/docker.sock
+  - name: monitoring-deploy
+    host:
+      path: /home/server
 
 trigger:
   branch:
