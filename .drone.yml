@@ -6,8 +6,6 @@ steps:
   - name: deploy
     image: docker:latest
     volumes:
-      - name: docker-sock
-        path: /var/run/docker.sock
       - name: monitoring-deploy
         path: /home/server/monitoring
     commands:
@@ -30,9 +28,6 @@ steps:
         from_secret: VM_AUTH_PASSWORD
 
 volumes:
-  - name: docker-sock
-    host:
-      path: /var/run/docker.sock
   - name: monitoring-deploy
     host:
       path: /home/server
