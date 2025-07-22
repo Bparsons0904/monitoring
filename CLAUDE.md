@@ -65,6 +65,8 @@ Set in `.env` file based on `.env.example`:
 - `GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD`: Grafana admin credentials
 - `VM_AUTH_USERNAME` / `VM_AUTH_PASSWORD`: VictoriaMetrics authentication
 
+**Important**: VMAuth uses `%{ENV_VAR}` syntax for environment variable substitution in config files, not `${ENV_VAR}`.
+
 ### Configuration Files
 - `configs/vmauth-config.yml`: VMAuth user authentication and routing configuration
 - `docker-compose.yml`: Service definitions and networking
@@ -84,8 +86,15 @@ docker compose ps
 
 ### Secrets Management
 Environment variables are managed through `.env` file:
-- `GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD`: Grafana admin credentials
-- `VM_AUTH_USERNAME` / `VM_AUTH_PASSWORD`: VictoriaMetrics authentication
+- `GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD`: Grafana admin credentials (use strong passwords)
+- `VM_AUTH_USERNAME` / `VM_AUTH_PASSWORD`: VictoriaMetrics authentication (use strong passwords)
+
+**Reset Grafana Admin User**: If you change credentials in `.env`, you must reset Grafana's database:
+```bash
+docker compose down
+docker volume rm monitoring_grafana_data
+docker compose up -d
+```
 
 ## Development Workflow
 

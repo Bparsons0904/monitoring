@@ -4,6 +4,9 @@ services:
     container_name: vmauth
     volumes:
       - ./configs/vmauth-config.yml:/etc/vmauth/config.yml:ro
+    environment:
+      - VM_AUTH_USERNAME=${VM_AUTH_USERNAME}
+      - VM_AUTH_PASSWORD=${VM_AUTH_PASSWORD}
     command:
       - "--auth.config=/etc/vmauth/config.yml"
     labels:

@@ -1,7 +1,7 @@
 users:
   # Admin user with full read/write access
-  - username: "${VM_AUTH_USERNAME}"
-    password: "${VM_AUTH_PASSWORD}"
+  - username: "%{VM_AUTH_USERNAME}"
+    password: "%{VM_AUTH_PASSWORD}"
     url_prefix: "http://victoriametrics:8428"
 
   # Optional: Read-only user for dashboards/monitoring tools
