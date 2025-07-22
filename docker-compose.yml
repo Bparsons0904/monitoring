@@ -47,11 +47,14 @@ services:
       - /sys:/host/sys:ro
       - /:/rootfs:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/log:/host/var/log:ro
+      - ./textfiles:/textfiles:ro
     command:
       - "--path.procfs=/host/proc"
       - "--path.sysfs=/host/sys"
       - "--path.rootfs=/rootfs"
       - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
+      - "--collector.textfile.directory=/textfiles"
       - "--web.listen-address=:9100"
     networks:
       - monitoring

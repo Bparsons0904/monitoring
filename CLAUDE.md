@@ -38,13 +38,28 @@ cp .env.example .env
 # Edit .env file with your credentials
 ```
 
+### Custom Metrics Collection
+```bash
+# SSH metrics script (runs via cron every 5 minutes)
+/home/server/monitoring/scripts/ssh_metrics.sh
+
+# Manually update SSH metrics
+./scripts/ssh_metrics.sh
+
+# View current SSH metrics
+cat ./textfiles/ssh_auth.prom
+
+# Check cron job status
+crontab -l | grep ssh_metrics
+```
+
 ## Architecture
 
 ### Service Stack
 - **VictoriaMetrics**: Time series database for metrics storage with 12-month retention
 - **VMAuth**: Authentication proxy for VictoriaMetrics with configurable user access
 - **Grafana**: Visualization dashboard with admin authentication
-- **Node Exporter**: System metrics collection including Docker container metrics
+- **Node Exporter**: System metrics collection with textfile collector for custom metrics
 
 ### Network Architecture
 - **Internal Network**: `monitoring` network for service-to-service communication
@@ -57,6 +72,7 @@ cp .env.example .env
 - VictoriaMetrics data: `vm_data` volume
 - Grafana configuration: `grafana_data` volume
 - External configuration mounting from `./configs/` directory
+- Custom metrics: `./textfiles/` directory for Node Exporter textfile collector
 
 ## Configuration Management
 
@@ -69,7 +85,9 @@ Set in `.env` file based on `.env.example`:
 
 ### Configuration Files
 - `configs/vmauth-config.yml`: VMAuth user authentication and routing configuration
+- `configs/grafana/provisioning/`: Grafana dashboards and datasources (configuration-as-code)
 - `docker-compose.yml`: Service definitions and networking
+- `scripts/ssh_metrics.sh`: SSH login tracking script for security monitoring
 
 ## CI/CD Integration
 
@@ -107,6 +125,13 @@ docker compose up -d
 ### Configuration Changes
 - VMAuth config changes: Edit `configs/vmauth-config.yml` and restart vmauth service
 - Service changes: Edit `docker-compose.yml` and run `docker compose up -d`
+- Dashboard changes: Edit JSON files in `configs/grafana/provisioning/dashboards/` and restart Grafana
+- Custom metrics: Modify or add scripts to `scripts/` directory
+
+### Custom Metrics Management
+- SSH metrics collected every 5 minutes via cron job: `*/5 * * * * /home/server/monitoring/scripts/ssh_metrics.sh`
+- Custom metrics stored in `textfiles/` directory for Node Exporter textfile collector
+- Add new metric scripts following the same pattern as `ssh_metrics.sh`
 
 ### Monitoring Access
 - Grafana: `https://grafana.bobparsons.dev` (SSL via Traefik/Let's Encrypt)
@@ -135,8 +160,9 @@ docker compose up -d
 
 ### Configuration Issues Fixed
 - **VictoriaMetrics**: Removed unsupported `evaluation_interval` from scrape config
-- **Node Exporter**: Removed unsupported `--collector.docker` flag
+- **Node Exporter**: Removed unsupported `--collector.docker` flag, added textfile collector
 - **Environment**: Use `.env` file instead of CI/CD secrets
+- **Grafana Dashboard**: Fixed JSON structure for provisioning compatibility
 
 ### Service Status Check
 ```bash
@@ -147,4 +173,22 @@ docker compose ps
 docker compose logs victoriametrics
 docker compose logs grafana
 docker compose logs vmauth
+docker compose logs node-exporter
 ```
+
+### Custom Metrics Troubleshooting
+```bash
+# Check if SSH metrics script is working
+./scripts/ssh_metrics.sh
+cat ./textfiles/ssh_auth.prom
+
+# Verify cron job is running
+crontab -l | grep ssh_metrics
+tail -f /var/log/syslog | grep CRON
+
+# Check Node Exporter textfile collector
+curl http://localhost:9100/metrics | grep ssh_
+```
+
+### Known Issues / TODO
+- **SSH Security Panels**: Currently showing "No data" due to textfile collector mount path issue in Node Exporter container. The SSH metrics script runs correctly and generates proper Prometheus format files, but Node Exporter is not reading from the mounted `./textfiles/` directory. This needs debugging of the Docker volume mount configuration.
