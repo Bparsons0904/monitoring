@@ -3,29 +3,36 @@ global:
 
 scrape_configs:
   # VictoriaMetrics itself
-  - job_name: 'victoriametrics'
+  - job_name: "victoriametrics"
     static_configs:
-      - targets: ['victoriametrics:8428']
+      - targets: ["victoriametrics:8428"]
     scrape_interval: 10s
     metrics_path: /metrics
 
   # Node Exporter for system metrics
-  - job_name: 'node-exporter'
+  - job_name: "node-exporter"
     static_configs:
-      - targets: ['node-exporter:9100']
+      - targets: ["node-exporter:9100"]
     scrape_interval: 15s
     metrics_path: /metrics
 
   # VMAuth metrics
-  - job_name: 'vmauth'
+  - job_name: "vmauth"
     static_configs:
-      - targets: ['vmauth:8427']
+      - targets: ["vmauth:8427"]
     scrape_interval: 15s
     metrics_path: /metrics
 
   # Grafana metrics
-  - job_name: 'grafana'
+  - job_name: "grafana"
     static_configs:
-      - targets: ['grafana:3000']
+      - targets: ["grafana:3000"]
     scrape_interval: 30s
     metrics_path: /metrics
+
+  - job_name: "nas-node-exporter"
+    static_configs:
+      - targets: ["192.168.86.201:9100"]
+    scrape_interval: 15s
+
+

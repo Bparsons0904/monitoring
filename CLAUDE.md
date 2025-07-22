@@ -43,14 +43,19 @@ cp .env.example .env
 # SSH metrics script (runs via cron every 5 minutes)
 /home/server/monitoring/scripts/ssh_metrics.sh
 
-# Manually update SSH metrics
-./scripts/ssh_metrics.sh
+# SMART metrics script for NVMe drive health (requires sudo)
+/home/server/monitoring/scripts/smart_metrics.sh
 
-# View current SSH metrics
+# Test scripts manually
+./scripts/ssh_metrics.sh
+sudo ./scripts/smart_metrics.sh
+
+# View current metrics
 cat ./textfiles/ssh_auth.prom
+cat ./textfiles/smart_metrics.prom
 
 # Check cron job status
-crontab -l | grep ssh_metrics
+crontab -l | grep -E 'ssh_metrics|smart_metrics'
 ```
 
 ## Architecture
@@ -192,3 +197,18 @@ curl http://localhost:9100/metrics | grep ssh_
 
 ### Known Issues / TODO
 - **SSH Security Panels**: Currently showing "No data" due to textfile collector mount path issue in Node Exporter container. The SSH metrics script runs correctly and generates proper Prometheus format files, but Node Exporter is not reading from the mounted `./textfiles/` directory. This needs debugging of the Docker volume mount configuration.
+- **SMART Drive Health Panels**: Same textfile collector mount issue affects SMART metrics. The `smart_metrics.sh` script generates proper Prometheus format SMART data for both NVMe drives (health status, temperature, power-on hours, wear level, etc.) but Node Exporter cannot access the textfiles. Both SSH and SMART metrics need the textfile collector mount path to be debugged.
+
+### SMART Metrics Setup (When Textfile Issue is Resolved)
+```bash
+# Set up SMART metrics collection with sudo privileges
+sudo crontab -e
+# Add: */10 * * * * /home/server/monitoring/scripts/smart_metrics.sh
+
+# The script collects:
+# - Device health status (1=healthy, 0=failing)
+# - Temperature in Celsius  
+# - Power-on hours and power cycles
+# - Data written and available spare percentage
+# - Drive lifetime usage percentage
+```

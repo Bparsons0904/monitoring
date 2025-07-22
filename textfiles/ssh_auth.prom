@@ -9,4 +9,4 @@ ssh_connections_total 0
 
 # HELP ssh_metrics_last_updated_timestamp Last time SSH metrics were updated
 # TYPE ssh_metrics_last_updated_timestamp gauge
-ssh_metrics_last_updated_timestamp 1753197001
+ssh_metrics_last_updated_timestamp 1753215901

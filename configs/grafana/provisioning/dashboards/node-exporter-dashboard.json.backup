@@ -215,7 +215,7 @@
         "type": "gauge",
         "targets": [
           {
-            "expr": "max(node_hwmon_temp_celsius{job=\"node-exporter\",chip=~\".*pci.*|r8169.*\"})",
+            "expr": "max(node_hwmon_temp_celsius{chip=~\".*pci.*|r8169.*\"})",
             "legendFormat": "CPU/Chip Temp"
           }
         ],
@@ -271,12 +271,12 @@
             "refId": "A"
           },
           {
-            "expr": "avg by (instance) (irate(node_cpu_seconds_total{job=\"node-exporter\",mode=\"system\"}[5m])) * 100",
+            "expr": "avg by (instance) (irate(node_cpu_seconds_total{mode=\"system\"}[5m])) * 100",
             "legendFormat": "System %",
             "refId": "B"
           },
           {
-            "expr": "avg by (instance) (irate(node_cpu_seconds_total{job=\"node-exporter\",mode=\"user\"}[5m])) * 100",
+            "expr": "avg by (instance) (irate(node_cpu_seconds_total{mode=\"user\"}[5m])) * 100",
             "legendFormat": "User %",
             "refId": "C"
           }
@@ -340,12 +340,12 @@
             "refId": "A"
           },
           {
-            "expr": "(node_memory_Buffers_bytes{job=\"node-exporter\"} / node_memory_MemTotal_bytes{job=\"node-exporter\"}) * 100",
+            "expr": "(node_memory_Buffers_bytes / node_memory_MemTotal_bytes) * 100",
             "legendFormat": "Buffers %",
             "refId": "B"
           },
           {
-            "expr": "(node_memory_Cached_bytes{job=\"node-exporter\"} / node_memory_MemTotal_bytes{job=\"node-exporter\"}) * 100",
+            "expr": "(node_memory_Cached_bytes / node_memory_MemTotal_bytes) * 100",
             "legendFormat": "Cached %",
             "refId": "C"
           }
@@ -404,12 +404,12 @@
         "type": "timeseries",
         "targets": [
           {
-            "expr": "rate(node_disk_read_bytes_total{job=\"node-exporter\"}[5m])",
+            "expr": "rate(node_disk_read_bytes_total[5m])",
             "legendFormat": "Read - {{device}}",
             "refId": "A"
           },
           {
-            "expr": "rate(node_disk_written_bytes_total{job=\"node-exporter\"}[5m])"
+            "expr": "rate(node_disk_written_bytes_total[5m])",
             "legendFormat": "Write - {{device}}",
             "refId": "B"
           }
@@ -467,12 +467,12 @@
         "type": "timeseries",
         "targets": [
           {
-            "expr": "rate(node_network_receive_bytes_total{job=\"node-exporter\",device!=\"lo\"}[5m])",
+            "expr": "rate(node_network_receive_bytes_total{device!=\"lo\"}[5m])",
             "legendFormat": "Receive - {{device}}",
             "refId": "A"
           },
           {
-            "expr": "rate(node_network_transmit_bytes_total{job=\"node-exporter\",device!=\"lo\"}[5m])",
+            "expr": "rate(node_network_transmit_bytes_total{device!=\"lo\"}[5m])",
             "legendFormat": "Transmit - {{device}}",
             "refId": "B"
           }
@@ -530,17 +530,17 @@
         "type": "timeseries",
         "targets": [
           {
-            "expr": "node_load1{job=\"node-exporter\"}",
+            "expr": "node_load1",
             "legendFormat": "1min Load",
             "refId": "A"
           },
           {
-            "expr": "node_load5{job=\"node-exporter\"}",
+            "expr": "node_load5",
             "legendFormat": "5min Load",
             "refId": "B"
           },
           {
-            "expr": "node_load15{job=\"node-exporter\"}",
+            "expr": "node_load15",
             "legendFormat": "15min Load",
             "refId": "C"
           }
@@ -598,7 +598,7 @@
         "type": "stat",
         "targets": [
           {
-            "expr": "(node_time_seconds{job=\"node-exporter\"} - node_boot_time_seconds{job=\"node-exporter\"}) / 86400"
+            "expr": "(node_time_seconds - node_boot_time_seconds) / 86400",
             "legendFormat": "Uptime Days"
           }
         ],
@@ -634,15 +634,15 @@
         "type": "gauge",
         "targets": [
           {
-            "expr": "node_hwmon_temp_celsius{job=\"node-exporter\",chip=~\".*pci.*\"}",
+            "expr": "node_hwmon_temp_celsius{chip=~\".*pci.*\"}",
             "legendFormat": "CPU: {{sensor}}"
           },
           {
-            "expr": "node_hwmon_temp_celsius{job=\"node-exporter\",chip=~\"nvme.*\"}",
+            "expr": "node_hwmon_temp_celsius{chip=~\"nvme.*\"}",
             "legendFormat": "{{chip}}: {{sensor}}"
           },
           {
-            "expr": "node_hwmon_temp_celsius{job=\"node-exporter\",chip=~\"r8169.*\"}"
+            "expr": "node_hwmon_temp_celsius{chip=~\"r8169.*\"}",
             "legendFormat": "Network Chip"
           }
         ],
@@ -788,188 +788,6 @@
         },
         "pluginVersion": "8.0.0",
         "gridPos": {"h": 8, "w": 12, "x": 12, "y": 48}
-      },
-      {
-        "id": 15,
-        "title": "NVMe Drive Health",
-        "type": "stat",
-        "targets": [
-          {
-            "expr": "smart_device_health{job=\"node-exporter\"}",
-            "legendFormat": "{{device}}"
-          }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "unit": "short",
-            "custom": {
-              "displayMode": "basic"
-            },
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "red",
-                  "value": 0
-                },
-                {
-                  "color": "green",
-                  "value": 1
-                }
-              ]
-            }
-          }
-        },
-        "options": {
-          "reduceOptions": {
-            "values": false,
-            "calcs": ["lastNotNull"],
-            "fields": ""
-          },
-          "orientation": "auto",
-          "textMode": "auto",
-          "colorMode": "value",
-          "graphMode": "none",
-          "justifyMode": "auto"
-        },
-        "pluginVersion": "8.0.0",
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 56}
-      },
-      {
-        "id": 16,
-        "title": "NVMe Drive Temperatures",
-        "type": "gauge",
-        "targets": [
-          {
-            "expr": "smart_device_temperature_celsius{job=\"node-exporter\"}",
-            "legendFormat": "{{device}}"
-          }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "unit": "celsius",
-            "min": 0,
-            "max": 80,
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "yellow",
-                  "value": 50
-                },
-                {
-                  "color": "red",
-                  "value": 70
-                }
-              ]
-            }
-          }
-        },
-        "options": {
-          "reduceOptions": {
-            "values": false,
-            "calcs": ["lastNotNull"],
-            "fields": ""
-          },
-          "orientation": "auto",
-          "textMode": "auto",
-          "colorMode": "value",
-          "graphMode": "area",
-          "justifyMode": "auto"
-        },
-        "pluginVersion": "8.0.0",
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 56}
-      },
-      {
-        "id": 17,
-        "title": "NVMe Drive Usage & Spare",
-        "type": "gauge",
-        "targets": [
-          {
-            "expr": "smart_device_used_percent{job=\"node-exporter\"}",
-            "legendFormat": "Used: {{device}}"
-          },
-          {
-            "expr": "100 - smart_device_spare_percent{job=\"node-exporter\"}",
-            "legendFormat": "Spare Used: {{device}}"
-          }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "unit": "percent",
-            "min": 0,
-            "max": 100,
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "yellow",
-                  "value": 80
-                },
-                {
-                  "color": "red",
-                  "value": 95
-                }
-              ]
-            }
-          }
-        },
-        "options": {
-          "reduceOptions": {
-            "values": false,
-            "calcs": ["lastNotNull"],
-            "fields": ""
-          },
-          "orientation": "auto",
-          "textMode": "auto",
-          "colorMode": "value",
-          "graphMode": "area",
-          "justifyMode": "auto"
-        },
-        "pluginVersion": "8.0.0",
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 64}
-      },
-      {
-        "id": 18,
-        "title": "NVMe Drive Power-On Hours",
-        "type": "stat",
-        "targets": [
-          {
-            "expr": "smart_device_power_on_hours_total{job=\"node-exporter\"} / 24",
-            "legendFormat": "{{device}} Days"
-          }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "unit": "d",
-            "decimals": 0,
-            "custom": {
-              "displayMode": "basic"
-            }
-          }
-        },
-        "options": {
-          "reduceOptions": {
-            "values": false,
-            "calcs": ["lastNotNull"],
-            "fields": ""
-          },
-          "orientation": "auto",
-          "textMode": "auto",
-          "colorMode": "value",
-          "graphMode": "area",
-          "justifyMode": "auto"
-        },
-        "pluginVersion": "8.0.0",
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 64}
       }
     ],
     "time": {

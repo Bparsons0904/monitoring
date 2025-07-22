@@ -48,7 +48,7 @@ services:
       - /:/rootfs:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/log:/host/var/log:ro
-      - ./textfiles:/textfiles:ro
+      - /home/server/monitoring/textfiles:/textfiles:ro
     command:
       - "--path.procfs=/host/proc"
       - "--path.sysfs=/host/sys"
@@ -63,6 +63,8 @@ services:
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
+    ports:
+      - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
       - ./configs/grafana/provisioning:/etc/grafana/provisioning:ro
@@ -86,6 +88,7 @@ services:
       - monitoring
       - traefik
     restart: unless-stopped
+
 
 networks:
   monitoring:
