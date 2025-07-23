@@ -5,9 +5,16 @@
 
 TEXTFILE_COLLECTOR_DIR="/home/server/monitoring/textfiles"
 PROM_FILE="$TEXTFILE_COLLECTOR_DIR/smart_metrics.prom"
+LOCK_FILE="/tmp/smart_metrics.lock"
 
 # Create textfile collector directory if it doesn't exist
 mkdir -p "$TEXTFILE_COLLECTOR_DIR"
+
+# Prevent multiple instances from running simultaneously
+if ! flock -n 200; then
+    echo "Another instance is already running. Exiting."
+    exit 1
+fi 200>"$LOCK_FILE"
 
 # Get current timestamp
 TIMESTAMP=$(date +%s)
@@ -109,6 +116,9 @@ cat > "$PROM_FILE" << EOF
 # TYPE smart_device_spare_percent gauge
 # HELP smart_device_used_percent Percentage of device lifetime used
 # TYPE smart_device_used_percent gauge
+# HELP smart_metrics_last_updated_timestamp Last time SMART metrics were updated
+# TYPE smart_metrics_last_updated_timestamp gauge
+
 EOF
 
 # Collect data for each NVMe device
@@ -118,13 +128,8 @@ for device in /dev/nvme[0-9]n1; do
     fi
 done
 
-# Add timestamp metric
-cat >> "$PROM_FILE" << EOF
-
-# HELP smart_metrics_last_updated_timestamp Last time SMART metrics were updated
-# TYPE smart_metrics_last_updated_timestamp gauge
-smart_metrics_last_updated_timestamp $TIMESTAMP
-
-EOF
+# Add timestamp metric (only once at the end)
+echo "" >> "$PROM_FILE"
+echo "smart_metrics_last_updated_timestamp $TIMESTAMP" >> "$PROM_FILE"
 
 echo "SMART metrics updated for $(ls /dev/nvme*n1 2>/dev/null | wc -l) devices"

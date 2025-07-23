@@ -1,4 +1,4 @@
-# SMART metrics collected at Wed Jul 23 09:00:01 AM CDT 2025
+# SMART metrics collected at Wed Jul 23 09:30:01 AM CDT 2025
 # HELP smart_device_health SMART health status (1=healthy, 0=failing)
 # TYPE smart_device_health gauge
 # HELP smart_device_temperature_celsius Current temperature in Celsius
@@ -13,14 +13,12 @@
 # TYPE smart_device_spare_percent gauge
 # HELP smart_device_used_percent Percentage of device lifetime used
 # TYPE smart_device_used_percent gauge
-
 # HELP smart_metrics_last_updated_timestamp Last time SMART metrics were updated
 # TYPE smart_metrics_last_updated_timestamp gauge
-smart_metrics_last_updated_timestamp 1753279201
 
 smart_device_health{device="nvme0n1"} 1
 smart_device_temperature_celsius{device="nvme0n1"} 36
-smart_device_power_on_hours_total{device="nvme0n1"} 116
+smart_device_power_on_hours_total{device="nvme0n1"} 117
 smart_device_power_cycles_total{device="nvme0n1"} 5
 smart_device_data_written_total{device="nvme0n1"} 0
 smart_device_spare_percent{device="nvme0n1"} 100
@@ -33,7 +31,4 @@ smart_device_data_written_total{device="nvme1n1"} 0
 smart_device_spare_percent{device="nvme1n1"} 100
 smart_device_used_percent{device="nvme1n1"} 0
 
-# HELP smart_metrics_last_updated_timestamp Last time SMART metrics were updated
-# TYPE smart_metrics_last_updated_timestamp gauge
-smart_metrics_last_updated_timestamp 1753279201
-
+smart_metrics_last_updated_timestamp 1753281001
