@@ -249,8 +249,14 @@ curl http://localhost:9100/metrics | grep ssh_
 - Data written, wear percentage, drive statistics
 - Docker container metrics (CPU, memory, network, disk I/O) via cAdvisor
 - Container resource usage and performance statistics for all services
+- Traefik reverse proxy metrics (requests/sec, response times, HTTP status codes)
+- Web traffic analysis, SSL/TLS usage, and service-level performance data
 
 ### Known Issues / TODO
 - **VictoriaLogs Integration**: VictoriaLogs implementation was attempted but reverted due to Grafana API compatibility issues. The VictoriaLogs API structure differs significantly from Loki, making drilldown functionality incompatible. Consider implementing when official VictoriaLogs Grafana plugin becomes available.
-- **Traefik Metrics**: Traefik metrics collection disabled - requires `metrics.prometheus` configuration in traefik.yml
 - **Service Metrics**: Additional services (Immich, Jellyfin, Vaultwarden, Drone) don't expose standard metrics endpoints
+
+### ✅ Recently Completed
+- **Traefik Metrics**: Successfully enabled Prometheus metrics collection with comprehensive reverse proxy monitoring
+- **Docker Container Metrics**: Full container monitoring via cAdvisor with resource usage tracking
+- **Web Traffic Analysis**: Real-time HTTP/HTTPS traffic monitoring with performance insights
