@@ -65,6 +65,7 @@ crontab -l | grep -E 'ssh_metrics|smart_metrics'
 - **VMAuth**: Authentication proxy for VictoriaMetrics with configurable user access
 - **Grafana**: Visualization dashboard with admin authentication
 - **Node Exporter**: System metrics collection with textfile collector for custom metrics
+- **cAdvisor**: Docker container metrics collection (CPU, memory, network, disk I/O)
 
 ### Network Architecture
 - **Internal Network**: `monitoring` network for service-to-service communication
@@ -78,6 +79,7 @@ crontab -l | grep -E 'ssh_metrics|smart_metrics'
 - Grafana configuration: `grafana_data` volume
 - External configuration mounting from `./configs/` directory
 - Custom metrics: `./textfiles/` directory for Node Exporter textfile collector
+- Container metrics: cAdvisor provides real-time Docker container statistics
 
 ## Configuration Management
 
@@ -245,6 +247,10 @@ curl http://localhost:9100/metrics | grep ssh_
 - Drive health status (both drives healthy)
 - Power-on hours, power cycles, spare capacity
 - Data written, wear percentage, drive statistics
+- Docker container metrics (CPU, memory, network, disk I/O) via cAdvisor
+- Container resource usage and performance statistics for all services
 
 ### Known Issues / TODO
 - **VictoriaLogs Integration**: VictoriaLogs implementation was attempted but reverted due to Grafana API compatibility issues. The VictoriaLogs API structure differs significantly from Loki, making drilldown functionality incompatible. Consider implementing when official VictoriaLogs Grafana plugin becomes available.
+- **Traefik Metrics**: Traefik metrics collection disabled - requires `metrics.prometheus` configuration in traefik.yml
+- **Service Metrics**: Additional services (Immich, Jellyfin, Vaultwarden, Drone) don't expose standard metrics endpoints

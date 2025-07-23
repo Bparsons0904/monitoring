@@ -35,4 +35,18 @@ scrape_configs:
       - targets: ["192.168.86.201:9100"]
     scrape_interval: 15s
 
+  # Traefik metrics (disabled - requires metrics.prometheus configuration in traefik.yml)
+  # - job_name: "traefik"
+  #   static_configs:
+  #     - targets: ["traefik:8080"]
+  #   scrape_interval: 15s
+  #   metrics_path: /metrics
+
+  # cAdvisor for Docker container metrics
+  - job_name: "cadvisor"
+    static_configs:
+      - targets: ["cadvisor:8080"]
+    scrape_interval: 15s
+    metrics_path: /metrics
+
 
