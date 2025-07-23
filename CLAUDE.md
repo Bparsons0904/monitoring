@@ -133,6 +133,22 @@ docker compose up -d
 - Dashboard changes: Edit JSON files in `configs/grafana/provisioning/dashboards/` and restart Grafana
 - Custom metrics: Modify or add scripts to `scripts/` directory
 
+### Grafana MCP Tool Usage Guidelines
+**IMPORTANT**: Maintain dashboard-as-code approach by keeping all dashboard definitions in JSON files under `configs/grafana/provisioning/dashboards/`.
+
+**Use Grafana MCP tools for**:
+- Querying live metrics data for testing/debugging (e.g., `query_prometheus`, `query_loki_logs`)
+- Checking available datasources and their configuration
+- Testing metric queries before adding them to dashboard JSON
+- Investigating live system issues
+
+**DO NOT use Grafana MCP tools for**:
+- Creating or modifying dashboards (use JSON files instead)
+- Making permanent configuration changes (edit config files instead)
+- Any changes that should be version controlled and reproducible
+
+**Workflow**: Test queries with MCP tools → Add working queries to dashboard JSON → Commit JSON changes to git
+
 ### Custom Metrics Management
 - SSH metrics collected every 5 minutes via cron job: `*/5 * * * * /home/server/monitoring/scripts/ssh_metrics.sh`
 - Custom metrics stored in `textfiles/` directory for Node Exporter textfile collector

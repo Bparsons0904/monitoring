@@ -1,6 +1,7 @@
 {
   "id": null,
   "title": "Server Metrics",
+  "uid": "server-metrics",
     "tags": ["node-exporter", "system"],
     "style": "dark",
     "timezone": "browser",
@@ -54,7 +55,7 @@
           "justifyMode": "auto"
         },
         "pluginVersion": "8.0.0",
-        "gridPos": {"h": 8, "w": 5, "x": 0, "y": 0}
+        "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
       },
       {
         "id": 2,
@@ -105,7 +106,7 @@
           "justifyMode": "auto"
         },
         "pluginVersion": "8.0.0",
-        "gridPos": {"h": 8, "w": 5, "x": 5, "y": 0}
+        "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0}
       },
       {
         "id": 3,
@@ -156,58 +157,7 @@
           "justifyMode": "auto"
         },
         "pluginVersion": "8.0.0",
-        "gridPos": {"h": 8, "w": 4, "x": 10, "y": 0}
-      },
-      {
-        "id": 8,
-        "title": "NAS Storage",
-        "type": "gauge",
-        "targets": [
-          {
-            "expr": "(1 - (node_filesystem_avail_bytes{mountpoint=~\"/mnt.*|/media.*|/nas.*\",job=\"node-exporter\"} / node_filesystem_size_bytes{mountpoint=~\"/mnt.*|/media.*|/nas.*\",job=\"node-exporter\"})) * 100",
-            "legendFormat": "NAS - {{mountpoint}}"
-          }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "unit": "percent",
-            "min": 0,
-            "max": 100,
-            "thresholds": {
-              "mode": "absolute",
-              "steps": [
-                {
-                  "color": "green",
-                  "value": null
-                },
-                {
-                  "color": "yellow",
-                  "value": 80
-                },
-                {
-                  "color": "red",
-                  "value": 90
-                }
-              ]
-            }
-          }
-        },
-        "options": {
-          "reduceOptions": {
-            "values": false,
-            "calcs": [
-              "lastNotNull"
-            ],
-            "fields": ""
-          },
-          "orientation": "auto",
-          "textMode": "auto",
-          "colorMode": "value",
-          "graphMode": "area",
-          "justifyMode": "auto"
-        },
-        "pluginVersion": "8.0.0",
-        "gridPos": {"h": 8, "w": 5, "x": 14, "y": 0}
+        "gridPos": {"h": 8, "w": 6, "x": 12, "y": 0}
       },
       {
         "id": 14,
@@ -258,7 +208,7 @@
           "justifyMode": "auto"
         },
         "pluginVersion": "8.0.0",
-        "gridPos": {"h": 8, "w": 5, "x": 19, "y": 0}
+        "gridPos": {"h": 8, "w": 6, "x": 18, "y": 0}
       },
       {
         "id": 4,
@@ -409,7 +359,7 @@
             "refId": "A"
           },
           {
-            "expr": "rate(node_disk_written_bytes_total{job=\"node-exporter\"}[5m])"
+            "expr": "rate(node_disk_written_bytes_total{job=\"node-exporter\"}[5m])",
             "legendFormat": "Write - {{device}}",
             "refId": "B"
           }
@@ -594,12 +544,12 @@
       },
       {
         "id": 10,
-        "title": "System Uptime",
+        "title": "Server Uptime (Days)",
         "type": "stat",
         "targets": [
           {
-            "expr": "(node_time_seconds{job=\"node-exporter\"} - node_boot_time_seconds{job=\"node-exporter\"}) / 86400"
-            "legendFormat": "Uptime Days"
+            "expr": "(node_time_seconds{job=\"node-exporter\"} - node_boot_time_seconds{job=\"node-exporter\"}) / 86400",
+            "legendFormat": "{{instance}} Days"
           }
         ],
         "fieldConfig": {
@@ -642,7 +592,7 @@
             "legendFormat": "{{chip}}: {{sensor}}"
           },
           {
-            "expr": "node_hwmon_temp_celsius{job=\"node-exporter\",chip=~\"r8169.*\"}"
+            "expr": "node_hwmon_temp_celsius{job=\"node-exporter\",chip=~\"r8169.*\"}",
             "legendFormat": "Network Chip"
           }
         ],
@@ -795,7 +745,7 @@
         "type": "stat",
         "targets": [
           {
-            "expr": "smart_device_health{job=\"node-exporter\"}",
+            "expr": "smart_device_health",
             "legendFormat": "{{device}}"
           }
         ],
@@ -841,7 +791,7 @@
         "type": "gauge",
         "targets": [
           {
-            "expr": "smart_device_temperature_celsius{job=\"node-exporter\"}",
+            "expr": "smart_device_temperature_celsius",
             "legendFormat": "{{device}}"
           }
         ],
@@ -890,11 +840,11 @@
         "type": "gauge",
         "targets": [
           {
-            "expr": "smart_device_used_percent{job=\"node-exporter\"}",
+            "expr": "smart_device_used_percent",
             "legendFormat": "Used: {{device}}"
           },
           {
-            "expr": "100 - smart_device_spare_percent{job=\"node-exporter\"}",
+            "expr": "100 - smart_device_spare_percent",
             "legendFormat": "Spare Used: {{device}}"
           }
         ],
@@ -943,7 +893,7 @@
         "type": "stat",
         "targets": [
           {
-            "expr": "smart_device_power_on_hours_total{job=\"node-exporter\"} / 24",
+            "expr": "smart_device_power_on_hours_total / 24",
             "legendFormat": "{{device}} Days"
           }
         ],

@@ -77,6 +77,10 @@ services:
       - GF_SECURITY_ALLOW_EMBEDDING=false
       - GF_AUTH_ANONYMOUS_ENABLED=false
       - GF_INSTALL_PLUGINS=grafana-clock-panel
+    dns:
+      - 127.0.0.1
+      - 8.8.8.8
+      - 1.1.1.1
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.grafana.rule=Host(`grafana.bobparsons.dev`)"

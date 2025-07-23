@@ -25,8 +25,18 @@ get_smart_data() {
     
     # Get SMART data in JSON format (requires root/sudo)
     local smart_json
-    if ! smart_json=$(sudo smartctl -a --json "$device" 2>/dev/null); then
-        echo "# Failed to get SMART data from $device" >&2
+    smart_json=$(sudo smartctl -a --json "$device" 2>&1)
+    local exit_code=$?
+    
+    # Check if we got valid JSON (smartctl may return exit code 4 but still provide valid data)
+    if ! echo "$smart_json" | jq . >/dev/null 2>&1; then
+        echo "# Failed to get valid SMART JSON from $device (exit: $exit_code)" >&2
+        return
+    fi
+    
+    # Check if SMART data is actually available
+    if ! echo "$smart_json" | jq -e '.smart_status' >/dev/null 2>&1; then
+        echo "# No SMART status data available from $device" >&2
         return
     fi
     
@@ -70,42 +80,35 @@ get_smart_data() {
         used_spare_percent=$(echo "$smart_text" | grep -i "percentage used" | awk '{print $3}' | tr -d '%' || echo 0)
     fi
     
-    # Output Prometheus metrics
+    # Output only metric values (HELP/TYPE written once in main script)
     cat >> "$PROM_FILE" << EOF
-# HELP smart_device_health SMART health status (1=healthy, 0=failing)
-# TYPE smart_device_health gauge
 smart_device_health{device="$device_name"} $health_status
-
-# HELP smart_device_temperature_celsius Current temperature in Celsius
-# TYPE smart_device_temperature_celsius gauge
 smart_device_temperature_celsius{device="$device_name"} $temperature
-
-# HELP smart_device_power_on_hours_total Total power-on hours
-# TYPE smart_device_power_on_hours_total counter
 smart_device_power_on_hours_total{device="$device_name"} $power_on_hours
-
-# HELP smart_device_power_cycles_total Total power cycles
-# TYPE smart_device_power_cycles_total counter
 smart_device_power_cycles_total{device="$device_name"} $power_cycles
-
-# HELP smart_device_data_written_total Data units written
-# TYPE smart_device_data_written_total counter
 smart_device_data_written_total{device="$device_name"} $data_written
-
-# HELP smart_device_spare_percent Available spare percentage
-# TYPE smart_device_spare_percent gauge
 smart_device_spare_percent{device="$device_name"} $spare_percent
-
-# HELP smart_device_used_percent Percentage of device lifetime used
-# TYPE smart_device_used_percent gauge
 smart_device_used_percent{device="$device_name"} $used_spare_percent
-
 EOF
 }
 
-# Start with fresh file
+# Start with fresh file with metric definitions
 cat > "$PROM_FILE" << EOF
 # SMART metrics collected at $(date)
+# HELP smart_device_health SMART health status (1=healthy, 0=failing)
+# TYPE smart_device_health gauge
+# HELP smart_device_temperature_celsius Current temperature in Celsius
+# TYPE smart_device_temperature_celsius gauge
+# HELP smart_device_power_on_hours_total Total power-on hours
+# TYPE smart_device_power_on_hours_total counter
+# HELP smart_device_power_cycles_total Total power cycles
+# TYPE smart_device_power_cycles_total counter
+# HELP smart_device_data_written_total Data units written
+# TYPE smart_device_data_written_total counter
+# HELP smart_device_spare_percent Available spare percentage
+# TYPE smart_device_spare_percent gauge
+# HELP smart_device_used_percent Percentage of device lifetime used
+# TYPE smart_device_used_percent gauge
 EOF
 
 # Collect data for each NVMe device
