@@ -66,6 +66,8 @@ crontab -l | grep -E 'ssh_metrics|smart_metrics'
 - **Grafana**: Visualization dashboard with admin authentication
 - **Node Exporter**: System metrics collection with textfile collector for custom metrics
 - **cAdvisor**: Docker container metrics collection (CPU, memory, network, disk I/O)
+- **MCP VictoriaMetrics**: Model Context Protocol server for VictoriaMetrics integration with Claude Code
+- **MCP Grafana**: Model Context Protocol server for Grafana integration with Claude Code
 
 ### Network Architecture
 - **Internal Network**: `monitoring` network for service-to-service communication
@@ -87,6 +89,7 @@ crontab -l | grep -E 'ssh_metrics|smart_metrics'
 Set in `.env` file based on `.env.example`:
 - `GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD`: Grafana admin credentials
 - `VM_AUTH_USERNAME` / `VM_AUTH_PASSWORD`: VictoriaMetrics authentication
+- `VM_BEARER_TOKEN`: Bearer token for VictoriaMetrics MCP authentication
 
 **Important**: VMAuth uses `%{ENV_VAR}` syntax for environment variable substitution in config files, not `${ENV_VAR}`.
 
@@ -113,6 +116,7 @@ docker compose ps
 Environment variables are managed through `.env` file:
 - `GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD`: Grafana admin credentials (use strong passwords)
 - `VM_AUTH_USERNAME` / `VM_AUTH_PASSWORD`: VictoriaMetrics authentication (use strong passwords)
+- `VM_BEARER_TOKEN`: VictoriaMetrics MCP bearer token (generated with `openssl rand -base64 32`)
 
 **Reset Grafana Admin User**: If you change credentials in `.env`, you must reset Grafana's database:
 ```bash
@@ -160,6 +164,7 @@ docker compose up -d
 - Grafana: `https://grafana.bobparsons.dev` (SSL via Traefik/Let's Encrypt)
 - VictoriaMetrics: `https://metrics.bobparsons.dev` (VMAuth proxy with authentication)
 - Node Exporter: Internal metrics collection on port 9100 (monitoring network only)
+- MCP VictoriaMetrics: Internal service on port 8080 (monitoring network only)
 
 ## Security Considerations
 
@@ -260,3 +265,4 @@ curl http://localhost:9100/metrics | grep ssh_
 - **Traefik Metrics**: Successfully enabled Prometheus metrics collection with comprehensive reverse proxy monitoring
 - **Docker Container Metrics**: Full container monitoring via cAdvisor with resource usage tracking
 - **Web Traffic Analysis**: Real-time HTTP/HTTPS traffic monitoring with performance insights
+- **MCP Integration**: Added VictoriaMetrics MCP server with bearer token authentication for Claude Code integration
