@@ -18,7 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 6,
+  "id": 7,
   "links": [],
   "panels": [
     {
@@ -29,7 +29,7 @@
       "fieldConfig": {
         "defaults": {
           "mappings": [],
-          "max": 90,
+          "max": 105,
           "min": 20,
           "thresholds": {
             "mode": "absolute",
@@ -39,11 +39,11 @@
               },
               {
                 "color": "yellow",
-                "value": 60
+                "value": 75
               },
               {
                 "color": "red",
-                "value": 80
+                "value": 90
               }
             ]
           },
@@ -80,7 +80,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"platform_coretemp_0\", sensor=\"temp1\"}",
+          "expr": "node_hwmon_temp_celsius{job=\"xps-17\", chip=\"platform_coretemp_0\", sensor=\"temp1\"}",
           "refId": "A"
         }
       ],
@@ -146,7 +146,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"nvme_nvme0\", sensor=\"temp1\"}",
+          "expr": "node_hwmon_temp_celsius{job=\"xps-17\", chip=\"nvme_nvme0\", sensor=\"temp1\"}",
           "refId": "A"
         }
       ],
@@ -212,7 +212,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"nvme_nvme1\", sensor=\"temp1\"}",
+          "expr": "node_hwmon_temp_celsius{job=\"xps-17\", chip=\"nvme_nvme1\", sensor=\"temp1\"}",
           "refId": "A"
         }
       ],
@@ -278,30 +278,12 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"0000:02:00_0_0000:03:00_0\", sensor=\"temp1\"}",
-          "legendFormat": "Edge",
+          "expr": "node_hwmon_temp_celsius{job=\"xps-17\", chip=~\"wmi_bus.*\", sensor=~\"temp[1-4]\"}",
+          "legendFormat": "Thermal Zone {{sensor}}",
           "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "P4169E866C3094E38"
-          },
-          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"0000:02:00_0_0000:03:00_0\", sensor=\"temp2\"}",
-          "legendFormat": "Junction",
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "P4169E866C3094E38"
-          },
-          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"0000:02:00_0_0000:03:00_0\", sensor=\"temp3\"}",
-          "legendFormat": "Memory",
-          "refId": "C"
         }
       ],
-      "title": "GPU Temperatures",
+      "title": "System Thermal Zones",
       "type": "gauge"
     },
     {
@@ -392,7 +374,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"platform_coretemp_0\", sensor=\"temp1\"}",
+          "expr": "node_hwmon_temp_celsius{job=\"xps-17\", chip=\"platform_coretemp_0\", sensor=\"temp1\"}",
           "legendFormat": "CPU",
           "refId": "A"
         }
@@ -488,7 +470,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"nvme_nvme0\", sensor=\"temp1\"}",
+          "expr": "node_hwmon_temp_celsius{job=\"xps-17\", chip=\"nvme_nvme0\", sensor=\"temp1\"}",
           "legendFormat": "NVMe 0",
           "refId": "A"
         },
@@ -497,7 +479,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"nvme_nvme1\", sensor=\"temp1\"}",
+          "expr": "node_hwmon_temp_celsius{job=\"xps-17\", chip=\"nvme_nvme1\", sensor=\"temp1\"}",
           "legendFormat": "NVMe 1",
           "refId": "B"
         }
@@ -558,7 +540,7 @@
               },
               {
                 "color": "red",
-                "value": 85
+                "value": 80
               }
             ]
           },
@@ -593,30 +575,12 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"0000:02:00_0_0000:03:00_0\", sensor=\"temp1\"}",
-          "legendFormat": "Edge",
+          "expr": "node_hwmon_temp_celsius{job=\"xps-17\", chip=~\"wmi_bus.*\", sensor=~\"temp[1-4]\"}",
+          "legendFormat": "Zone {{sensor}}",
           "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "P4169E866C3094E38"
-          },
-          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"0000:02:00_0_0000:03:00_0\", sensor=\"temp2\"}",
-          "legendFormat": "Junction",
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "P4169E866C3094E38"
-          },
-          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"0000:02:00_0_0000:03:00_0\", sensor=\"temp3\"}",
-          "legendFormat": "Memory",
-          "refId": "C"
         }
       ],
-      "title": "GPU Temperatures Over Time",
+      "title": "Thermal Zones Over Time",
       "type": "timeseries"
     },
     {
@@ -678,7 +642,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "100 - (avg(rate(node_cpu_seconds_total{job=\"mira-desktop\",mode=\"idle\"}[5m])) * 100)",
+          "expr": "100 - (avg(rate(node_cpu_seconds_total{job=\"xps-17\",mode=\"idle\"}[5m])) * 100)",
           "refId": "A"
         }
       ],
@@ -744,7 +708,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "((node_memory_MemTotal_bytes{job=\"mira-desktop\"} - node_memory_MemAvailable_bytes{job=\"mira-desktop\"}) / node_memory_MemTotal_bytes{job=\"mira-desktop\"}) * 100",
+          "expr": "((node_memory_MemTotal_bytes{job=\"xps-17\"} - node_memory_MemAvailable_bytes{job=\"xps-17\"}) / node_memory_MemTotal_bytes{job=\"xps-17\"}) * 100",
           "refId": "A"
         }
       ],
@@ -839,7 +803,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "100 - (avg by(instance) (rate(node_cpu_seconds_total{job=\"mira-desktop\",mode=\"idle\"}[5m])) * 100)",
+          "expr": "100 - (avg by(instance) (rate(node_cpu_seconds_total{job=\"xps-17\",mode=\"idle\"}[5m])) * 100)",
           "refId": "A"
         }
       ],
@@ -934,7 +898,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_memory_MemTotal_bytes{job=\"mira-desktop\"} - node_memory_MemAvailable_bytes{job=\"mira-desktop\"}",
+          "expr": "node_memory_MemTotal_bytes{job=\"xps-17\"} - node_memory_MemAvailable_bytes{job=\"xps-17\"}",
           "legendFormat": "Used Memory",
           "refId": "A"
         },
@@ -943,7 +907,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_memory_MemAvailable_bytes{job=\"mira-desktop\"}",
+          "expr": "node_memory_MemAvailable_bytes{job=\"xps-17\"}",
           "legendFormat": "Available Memory",
           "refId": "B"
         }
@@ -1010,7 +974,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_load1{job=\"mira-desktop\"}",
+          "expr": "node_load1{job=\"xps-17\"}",
           "refId": "A"
         }
       ],
@@ -1109,7 +1073,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_load1{job=\"mira-desktop\"}",
+          "expr": "node_load1{job=\"xps-17\"}",
           "legendFormat": "1m",
           "refId": "A"
         },
@@ -1118,7 +1082,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_load5{job=\"mira-desktop\"}",
+          "expr": "node_load5{job=\"xps-17\"}",
           "legendFormat": "5m",
           "refId": "B"
         },
@@ -1127,7 +1091,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_load15{job=\"mira-desktop\"}",
+          "expr": "node_load15{job=\"xps-17\"}",
           "legendFormat": "15m",
           "refId": "C"
         }
@@ -1223,7 +1187,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "rate(node_disk_read_bytes_total{job=\"mira-desktop\"}[5m])",
+          "expr": "rate(node_disk_read_bytes_total{job=\"xps-17\"}[5m])",
           "legendFormat": "{{device}} - Read",
           "refId": "A"
         },
@@ -1232,7 +1196,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "rate(node_disk_written_bytes_total{job=\"mira-desktop\"}[5m])",
+          "expr": "rate(node_disk_written_bytes_total{job=\"xps-17\"}[5m])",
           "legendFormat": "{{device}} - Write",
           "refId": "B"
         }
@@ -1299,7 +1263,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "100 - ((node_filesystem_avail_bytes{job=\"mira-desktop\",fstype!=\"tmpfs\"} * 100) / node_filesystem_size_bytes{job=\"mira-desktop\",fstype!=\"tmpfs\"})",
+          "expr": "100 - ((node_filesystem_avail_bytes{job=\"xps-17\",fstype!=\"tmpfs\"} * 100) / node_filesystem_size_bytes{job=\"xps-17\",fstype!=\"tmpfs\"})",
           "refId": "A"
         }
       ],
@@ -1401,7 +1365,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_filesystem_size_bytes{job=\"mira-desktop\",fstype!=\"tmpfs\"}",
+          "expr": "node_filesystem_size_bytes{job=\"xps-17\",fstype!=\"tmpfs\"}",
           "format": "table",
           "legendFormat": "{{mountpoint}}",
           "refId": "A"
@@ -1411,7 +1375,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_filesystem_avail_bytes{job=\"mira-desktop\",fstype!=\"tmpfs\"}",
+          "expr": "node_filesystem_avail_bytes{job=\"xps-17\",fstype!=\"tmpfs\"}",
           "format": "table",
           "legendFormat": "{{mountpoint}}",
           "refId": "B"
@@ -1421,7 +1385,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "100 - ((node_filesystem_avail_bytes{job=\"mira-desktop\",fstype!=\"tmpfs\"} * 100) / node_filesystem_size_bytes{job=\"mira-desktop\",fstype!=\"tmpfs\"})",
+          "expr": "100 - ((node_filesystem_avail_bytes{job=\"xps-17\",fstype!=\"tmpfs\"} * 100) / node_filesystem_size_bytes{job=\"xps-17\",fstype!=\"tmpfs\"})",
           "format": "table",
           "legendFormat": "{{mountpoint}}",
           "refId": "C"
@@ -1462,8 +1426,8 @@
   "refresh": "30s",
   "schemaVersion": 41,
   "tags": [
-    "mira",
-    "desktop",
+    "xps-17",
+    "laptop",
     "node-exporter"
   ],
   "templating": {
@@ -1475,7 +1439,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "Mira Desktop Metrics",
-  "uid": "mira-desktop",
-  "version": 13
+  "title": "XPS-17 Laptop Metrics",
+  "uid": "xps-17",
+  "version": 1
 }
