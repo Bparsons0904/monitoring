@@ -49,4 +49,28 @@ scrape_configs:
     scrape_interval: 15s
     metrics_path: /metrics
 
+  - job_name: "mira-desktop"
+    static_configs:
+      - targets:
+          - "192.168.86.200:9100"
+    scrape_interval: 30s
 
+  - job_name: "xps-17"
+    static_configs:
+      - targets:
+          - "192.168.86.204:9100"
+    scrape_interval: 30s
+
+  # Kleio service metrics
+  - job_name: "kleio"
+    static_configs:
+      - targets: ["kleio:8080"]
+    scrape_interval: 15s
+    metrics_path: /metrics
+
+  # Technitium DNS Server metrics
+  - job_name: "technitium-dns"
+    static_configs:
+      - targets: ["technitium-exporter:4001"]
+    scrape_interval: 15s
+    metrics_path: /metrics
