@@ -678,7 +678,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "100 - (avg(rate(node_cpu_seconds_total{job=\"mira-desktop\",mode=\"idle\"}[5m])) * 100)",
+          "expr": "100 * (1 - avg by (instance) (rate(node_cpu_seconds_total{job=\"mira-desktop\", mode=\"idle\"}[5m])) - avg by (instance) (rate(node_cpu_seconds_total{job=\"mira-desktop\", mode=\"iowait\"}[5m])))",
           "refId": "A"
         }
       ],
@@ -839,7 +839,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "100 - (avg by(instance) (rate(node_cpu_seconds_total{job=\"mira-desktop\",mode=\"idle\"}[5m])) * 100)",
+          "expr": "100 * (1 - avg by (instance) (rate(node_cpu_seconds_total{job=\"mira-desktop\", mode=\"idle\"}[5m])) - avg by (instance) (rate(node_cpu_seconds_total{job=\"mira-desktop\", mode=\"iowait\"}[5m])))",
           "refId": "A"
         }
       ],

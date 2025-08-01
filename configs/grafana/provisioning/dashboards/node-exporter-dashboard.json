@@ -84,7 +84,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode=\"idle\",job=\"node-exporter\"}[5m])) * 100)",
+          "expr": "100 * (1 - avg by (instance) (rate(node_cpu_seconds_total{job=\"node-exporter\", mode=\"idle\"}[5m])) - avg by (instance) (rate(node_cpu_seconds_total{job=\"node-exporter\", mode=\"iowait\"}[5m])))",
           "legendFormat": "CPU Usage %",
           "refId": "A"
         }
@@ -350,7 +350,6 @@
             }
           },
           "mappings": [],
-          "max": 100,
           "min": 0,
           "thresholds": {
             "mode": "absolute",
@@ -399,7 +398,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode=\"idle\",job=\"node-exporter\"}[5m])) * 100)",
+          "expr": "100 * (1 - avg by (instance) (rate(node_cpu_seconds_total{job=\"node-exporter\", mode=\"idle\"}[5m])) - avg by (instance) (rate(node_cpu_seconds_total{job=\"node-exporter\", mode=\"iowait\"}[5m])))",
           "legendFormat": "CPU Usage %",
           "refId": "A"
         },
@@ -408,7 +407,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "avg by (instance) (irate(node_cpu_seconds_total{job=\"node-exporter\",mode=\"system\"}[5m])) * 100",
+          "expr": "avg by (instance) (rate(node_cpu_seconds_total{job=\"node-exporter\",mode=\"system\"}[5m])) * 100",
           "legendFormat": "System %",
           "refId": "B"
         },
@@ -417,7 +416,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "avg by (instance) (irate(node_cpu_seconds_total{job=\"node-exporter\",mode=\"user\"}[5m])) * 100",
+          "expr": "avg by (instance) (rate(node_cpu_seconds_total{job=\"node-exporter\",mode=\"user\"}[5m])) * 100",
           "legendFormat": "User %",
           "refId": "C"
         }
@@ -470,7 +469,6 @@
             }
           },
           "mappings": [],
-          "max": 100,
           "min": 0,
           "thresholds": {
             "mode": "absolute",
