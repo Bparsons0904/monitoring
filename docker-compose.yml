@@ -78,12 +78,14 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /var/log:/host/var/log:ro
       - /home/server/monitoring/textfiles:/textfiles:ro
+      - /var/lib/node_exporter/textfile_collector:/borgmatic:ro
     command:
       - "--path.procfs=/host/proc"
       - "--path.sysfs=/host/sys"
       - "--path.rootfs=/rootfs"
       - "--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)"
       - "--collector.textfile.directory=/textfiles"
+      - "--collector.textfile.directory=/borgmatic"
       - "--web.listen-address=:9100"
     networks:
       - monitoring

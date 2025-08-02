@@ -1,11 +1,11 @@
 # HELP room_temperature_celsius Room temperature in Celsius
 # TYPE room_temperature_celsius gauge
-room_temperature_celsius{sensor="sht4x",location="server_room"} 21.42
+room_temperature_celsius{sensor="sht4x",location="server_room"} 20.34
 
 # HELP room_humidity_percent Room humidity percentage  
 # TYPE room_humidity_percent gauge
-room_humidity_percent{sensor="sht4x",location="server_room"} 36.70
+room_humidity_percent{sensor="sht4x",location="server_room"} 35.27
 
 # HELP temp_humidity_last_updated_timestamp Last update timestamp for temperature/humidity metrics
 # TYPE temp_humidity_last_updated_timestamp gauge
-temp_humidity_last_updated_timestamp 1754100301
+temp_humidity_last_updated_timestamp 1754141401

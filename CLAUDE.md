@@ -230,12 +230,15 @@ curl http://localhost:9100/metrics | grep ssh_
 - **SMART Drive Health**: Complete NVMe drive monitoring (temperature, health, wear, power-on hours)
 - **System Metrics**: CPU, memory, disk, network via Node Exporter
 - **Custom Metrics**: Textfile collector integration fully operational
+- **Backup Monitoring**: Borgmatic backup status and timing for server and mira desktop, with XPS17 support ready
 
 **📊 Dashboard Status:**
 - **Server Metrics Dashboard**: Optimized layout with working SSH and SMART panels
 - **SSH Security Panels**: Displaying live success/failure counts and connection tracking
 - **SMART Drive Health Panels**: Real-time temperature, health status, and drive statistics
 - **NVMe Monitoring**: Individual drive data for nvme0n1 and nvme1n1
+- **Backup Monitoring Dashboard**: Dedicated dashboard showing borgmatic backup status across all systems
+- **XPS17 Dashboard**: Extended with backup monitoring panels (ready for metrics when node_exporter configured)
 
 **🔧 Current Configuration (Working):**
 ```bash
@@ -256,12 +259,17 @@ curl http://localhost:9100/metrics | grep ssh_
 - Container resource usage and performance statistics for all services
 - Traefik reverse proxy metrics (requests/sec, response times, HTTP status codes)
 - Web traffic analysis, SSL/TLS usage, and service-level performance data
+- Borgmatic backup success/failure status and last run timestamps for server and mira
 
 ### Known Issues / TODO
+- **XPS17 Backup Metrics**: Node_exporter on XPS17 needs textfile collector configuration: `node_exporter --collector.textfile.directory=/home/bobparsons/Development/backup/metrics/`
 - **VictoriaLogs Integration**: VictoriaLogs implementation was attempted but reverted due to Grafana API compatibility issues. The VictoriaLogs API structure differs significantly from Loki, making drilldown functionality incompatible. Consider implementing when official VictoriaLogs Grafana plugin becomes available.
 - **Service Metrics**: Additional services (Immich, Jellyfin, Vaultwarden, Drone) don't expose standard metrics endpoints
 
 ### ✅ Recently Completed
+- **Backup Monitoring Extension**: Extended XPS17 dashboard with backup monitoring panels matching server/mira implementation
+- **Dashboard Integration**: Added backup status and timing panels to XPS17 dashboard with proper tagging and queries
+- **Monitoring Infrastructure**: Backup observability ready for XPS17 once node_exporter textfile collector is configured
 - **Traefik Metrics**: Successfully enabled Prometheus metrics collection with comprehensive reverse proxy monitoring
 - **Docker Container Metrics**: Full container monitoring via cAdvisor with resource usage tracking
 - **Web Traffic Analysis**: Real-time HTTP/HTTPS traffic monitoring with performance insights

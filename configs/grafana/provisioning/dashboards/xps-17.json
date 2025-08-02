@@ -1420,6 +1420,152 @@
         }
       ],
       "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P4169E866C3094E38"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "Failed"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 1,
+                  "text": "Success"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red"
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 64
+      },
+      "id": 17,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P4169E866C3094E38"
+          },
+          "expr": "borgmatic_backup_success{job=\"xps-17\", config=\"xps17\"}",
+          "legendFormat": "XPS17 Backup",
+          "refId": "A"
+        }
+      ],
+      "title": "XPS17 Backup Status",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P4169E866C3094E38"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "yellow",
+                "value": 7
+              },
+              {
+                "color": "red",
+                "value": 24
+              }
+            ]
+          },
+          "unit": "h"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 64
+      },
+      "id": 18,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P4169E866C3094E38"
+          },
+          "expr": "(time() - borgmatic_backup_last_run_timestamp{job=\"xps-17\"}) / 3600",
+          "legendFormat": "Hours since last run",
+          "refId": "A"
+        }
+      ],
+      "title": "Time Since Last XPS17 Backup",
+      "type": "stat"
     }
   ],
   "preload": false,
@@ -1428,7 +1574,9 @@
   "tags": [
     "xps-17",
     "laptop",
-    "node-exporter"
+    "node-exporter",
+    "backup",
+    "borgmatic"
   ],
   "templating": {
     "list": []
