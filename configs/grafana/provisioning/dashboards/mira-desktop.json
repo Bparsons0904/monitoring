@@ -80,7 +80,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"platform_coretemp_0\", sensor=\"temp1\"}",
+          "expr": "avg(node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"platform_coretemp_0\"})",
           "refId": "A"
         }
       ],
@@ -278,8 +278,8 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"0000:02:00_0_0000:03:00_0\", sensor=\"temp1\"}",
-          "legendFormat": "Edge",
+          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"wmi_bus_pnp0c14:02_deadbeef_2001_0000_00a0_c90629100000\", sensor=\"temp1\"}",
+          "legendFormat": "GPU Temp 1",
           "refId": "A"
         },
         {
@@ -287,8 +287,8 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"0000:02:00_0_0000:03:00_0\", sensor=\"temp2\"}",
-          "legendFormat": "Junction",
+          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"wmi_bus_pnp0c14:02_deadbeef_2001_0000_00a0_c90629100000\", sensor=\"temp2\"}",
+          "legendFormat": "GPU Temp 2",
           "refId": "B"
         },
         {
@@ -296,8 +296,8 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"0000:02:00_0_0000:03:00_0\", sensor=\"temp3\"}",
-          "legendFormat": "Memory",
+          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"wmi_bus_pnp0c14:02_deadbeef_2001_0000_00a0_c90629100000\", sensor=\"temp3\"}",
+          "legendFormat": "GPU Temp 3",
           "refId": "C"
         }
       ],
@@ -392,7 +392,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"platform_coretemp_0\", sensor=\"temp1\"}",
+          "expr": "avg(node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"platform_coretemp_0\"})",
           "legendFormat": "CPU",
           "refId": "A"
         }
@@ -593,8 +593,8 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"0000:02:00_0_0000:03:00_0\", sensor=\"temp1\"}",
-          "legendFormat": "Edge",
+          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"wmi_bus_pnp0c14:02_deadbeef_2001_0000_00a0_c90629100000\", sensor=\"temp1\"}",
+          "legendFormat": "GPU Temp 1",
           "refId": "A"
         },
         {
@@ -602,8 +602,8 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"0000:02:00_0_0000:03:00_0\", sensor=\"temp2\"}",
-          "legendFormat": "Junction",
+          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"wmi_bus_pnp0c14:02_deadbeef_2001_0000_00a0_c90629100000\", sensor=\"temp2\"}",
+          "legendFormat": "GPU Temp 2",
           "refId": "B"
         },
         {
@@ -611,8 +611,8 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"0000:02:00_0_0000:03:00_0\", sensor=\"temp3\"}",
-          "legendFormat": "Memory",
+          "expr": "node_hwmon_temp_celsius{job=\"mira-desktop\", chip=\"wmi_bus_pnp0c14:02_deadbeef_2001_0000_00a0_c90629100000\", sensor=\"temp3\"}",
+          "legendFormat": "GPU Temp 3",
           "refId": "C"
         }
       ],
@@ -1456,6 +1456,152 @@
         }
       ],
       "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P4169E866C3094E38"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "Failed"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 1,
+                  "text": "Success"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red"
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 64
+      },
+      "id": 17,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P4169E866C3094E38"
+          },
+          "expr": "borgmatic_backup_success{job=\"mira-desktop\", config=\"mira\"}",
+          "legendFormat": "Mira Backup",
+          "refId": "A"
+        }
+      ],
+      "title": "Mira Backup Status",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "P4169E866C3094E38"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "yellow",
+                "value": 7
+              },
+              {
+                "color": "red",
+                "value": 24
+              }
+            ]
+          },
+          "unit": "h"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 64
+      },
+      "id": 18,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "P4169E866C3094E38"
+          },
+          "expr": "(time() - borgmatic_backup_last_run_timestamp{job=\"mira-desktop\"}) / 3600",
+          "legendFormat": "Hours since last run",
+          "refId": "A"
+        }
+      ],
+      "title": "Time Since Last Mira Backup",
+      "type": "stat"
     }
   ],
   "preload": false,

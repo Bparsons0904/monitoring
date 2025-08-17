@@ -30,8 +30,8 @@
             "mode": "thresholds"
           },
           "mappings": [],
-          "max": 35,
-          "min": 15,
+          "max": 55,
+          "min": 25,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -41,15 +41,15 @@
               },
               {
                 "color": "green",
-                "value": 18
+                "value": 30
               },
               {
                 "color": "yellow",
-                "value": 25
+                "value": 45
               },
               {
                 "color": "red",
-                "value": 30
+                "value": 50
               }
             ]
           },
@@ -104,8 +104,8 @@
             "mode": "thresholds"
           },
           "mappings": [],
-          "max": 95,
-          "min": 59,
+          "max": 131,
+          "min": 77,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -115,15 +115,15 @@
               },
               {
                 "color": "green",
-                "value": 64
+                "value": 86
               },
               {
                 "color": "yellow",
-                "value": 77
+                "value": 113
               },
               {
                 "color": "red",
-                "value": 86
+                "value": 122
               }
             ]
           },
@@ -206,8 +206,8 @@
             }
           },
           "mappings": [],
-          "max": 35,
-          "min": 15,
+          "max": 55,
+          "min": 25,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -217,15 +217,15 @@
               },
               {
                 "color": "green",
-                "value": 18
+                "value": 30
               },
               {
                 "color": "yellow",
-                "value": 25
+                "value": 45
               },
               {
                 "color": "red",
-                "value": 30
+                "value": 50
               }
             ]
           },
@@ -290,19 +290,19 @@
               },
               {
                 "color": "yellow",
-                "value": 20
+                "value": 10
               },
               {
                 "color": "green",
-                "value": 40
+                "value": 20
               },
               {
                 "color": "yellow",
-                "value": 60
+                "value": 65
               },
               {
                 "color": "red",
-                "value": 80
+                "value": 75
               }
             ]
           },
@@ -400,19 +400,19 @@
               },
               {
                 "color": "yellow",
-                "value": 20
+                "value": 10
               },
               {
                 "color": "green",
-                "value": 40
+                "value": 20
               },
               {
                 "color": "yellow",
-                "value": 60
+                "value": 65
               },
               {
                 "color": "red",
-                "value": 80
+                "value": 75
               }
             ]
           },

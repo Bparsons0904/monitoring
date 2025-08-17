@@ -267,6 +267,21 @@ curl http://localhost:9100/metrics | grep ssh_
 - **Service Metrics**: Additional services (Immich, Jellyfin, Vaultwarden, Drone) don't expose standard metrics endpoints
 
 ### ✅ Recently Completed
+- **Room Temperature Sensor Fix (2025-08-17)**: Fixed critical CSV parsing error in Adafruit SHT4x sensor script
+  - **Issue**: Temperature readings showed impossibly low values (18.9°C/66°F) for server room with gaming PC, NAS, networking equipment
+  - **Root Cause**: CSV field parsing error - script assumed format `timestamp,humidity,temperature,extra` but sensor outputs `timestamp,temperature,humidity,extra`
+  - **Fix**: Swapped `parts[1]` and `parts[2]` in `parse_sensor_response()` function in `scripts/temp_humidity_simple.py`
+  - **Before**: 18.9°C (66°F) temp, 39% humidity - Obviously wrong for equipment-filled server room
+  - **After**: 39.3°C (102.8°F) temp, 18.8% humidity - Accurate for server closet with gaming PC + RTX 5060 Ti + NAS + networking gear
+  - **Verification**: Sensor readings now make sense - hot server room, dry air from equipment heat
+- **Mira Dashboard GPU Update (2025-08-17)**: Updated mira desktop dashboard for AMD→Nvidia GPU swap
+  - **Changed**: GPU chip identifier from `0000:02:00_0_0000:03:00_0` to `wmi_bus_pnp0c14:02_deadbeef_2001_0000_00a0_c90629100000`
+  - **Updated**: Legend labels from AMD-specific (Edge/Junction/Memory) to generic (GPU Temp 1/2/3)
+  - **Result**: Dashboard now displays Nvidia RTX 5060 Ti temperature data correctly
+- **CPU Temperature Monitoring Fix (2025-08-17)**: Changed CPU temperature from single sensor to average of all cores
+  - **Issue**: Single temp1 sensor showed 49°C with occasional spikes that seemed inaccurate
+  - **Fix**: Updated both gauge and timeseries panels to use `avg(node_hwmon_temp_celsius{job="mira-desktop", chip="platform_coretemp_0"})`
+  - **Result**: More stable 43.3°C average reading across all 25 CPU temperature sensors, eliminates odd spikes
 - **Backup Monitoring Extension**: Extended XPS17 dashboard with backup monitoring panels matching server/mira implementation
 - **Dashboard Integration**: Added backup status and timing panels to XPS17 dashboard with proper tagging and queries
 - **Monitoring Infrastructure**: Backup observability ready for XPS17 once node_exporter textfile collector is configured

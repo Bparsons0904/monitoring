@@ -110,7 +110,7 @@
               },
               {
                 "color": "yellow",
-                "value": 75
+                "value": 70
               },
               {
                 "color": "red",
@@ -155,7 +155,7 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "(1 - (node_memory_MemAvailable_bytes{job=\"node-exporter\"} / node_memory_MemTotal_bytes{job=\"node-exporter\"})) * 100",
+          "expr": "((node_memory_MemTotal_bytes{job=\"node-exporter\"} - node_memory_MemAvailable_bytes{job=\"node-exporter\"}) / node_memory_MemTotal_bytes{job=\"node-exporter\"}) * 100",
           "legendFormat": "Memory Usage %",
           "refId": "A"
         }
@@ -517,8 +517,8 @@
             "type": "prometheus",
             "uid": "P4169E866C3094E38"
           },
-          "expr": "(1 - (node_memory_MemAvailable_bytes{job=\"node-exporter\"} / node_memory_MemTotal_bytes{job=\"node-exporter\"})) * 100",
-          "legendFormat": "Memory Used %",
+          "expr": "((node_memory_MemTotal_bytes{job=\"node-exporter\"} - node_memory_MemAvailable_bytes{job=\"node-exporter\"}) / node_memory_MemTotal_bytes{job=\"node-exporter\"}) * 100",
+          "legendFormat": "Memory Usage %",
           "refId": "A"
         },
         {

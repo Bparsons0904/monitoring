@@ -74,14 +74,14 @@ def read_sensor_data(device_path):
     return None, None
 
 def parse_sensor_response(response):
-    """Parse sensor response in CSV format: timestamp, humidity, temperature, extra"""
+    """Parse sensor response in CSV format: timestamp, temperature, humidity, extra"""
     try:
         if ',' in response:
             parts = [p.strip() for p in response.split(',')]
             if len(parts) >= 3:
-                # Format appears to be: timestamp, humidity, temperature, extra
-                humidity = float(parts[1])
-                temperature = float(parts[2])
+                # Format appears to be: timestamp, temperature, humidity, extra
+                temperature = float(parts[1])
+                humidity = float(parts[2])
                 
                 # Basic sanity check
                 if -40 <= temperature <= 85 and 0 <= humidity <= 100:
