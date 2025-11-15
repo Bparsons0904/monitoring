@@ -11,3 +11,12 @@ datasources:
       timeInterval: 15s
       httpMethod: POST
     version: 1
+
+  - name: VictoriaLogs
+    type: loki
+    access: proxy
+    url: http://victorialogs:9428/select/logsql/loki_api/v1
+    editable: true
+    jsonData:
+      maxLines: 1000
+    version: 1

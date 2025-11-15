@@ -1,6 +1,6 @@
 services:
   vmauth:
-    image: victoriametrics/vmauth:latest
+    image: victoriametrics/vmauth:v1.129.1
     container_name: vmauth
     volumes:
       - ./configs/vmauth-config.yml:/etc/vmauth/config.yml:ro
@@ -24,7 +24,7 @@ services:
       - victoriametrics
 
   victoriametrics:
-    image: victoriametrics/victoria-metrics:latest
+    image: victoriametrics/victoria-metrics:v1.129.1
     container_name: victoriametrics
     ports:
       - "8428:8428"
@@ -42,7 +42,7 @@ services:
     restart: unless-stopped
 
   mcp-victoriametrics:
-    image: ghcr.io/victoriametrics-community/mcp-victoriametrics:latest
+    image: ghcr.io/victoriametrics-community/mcp-victoriametrics:v1.16.1
     container_name: mcp-victoriametrics
     environment:
       # MCP_SERVER_MODE: Set to 'sse' for Server-Sent Events, or 'ws' for WebSockets.
@@ -69,7 +69,7 @@ services:
       - victoriametrics # Ensures VictoriaMetrics starts before MCP
 
   node-exporter:
-    image: prom/node-exporter:latest
+    image: prom/node-exporter:v1.10.2
     container_name: node-exporter
     volumes:
       - /proc:/host/proc:ro
@@ -92,7 +92,7 @@ services:
     restart: unless-stopped
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:12.2.1
     container_name: grafana
     ports:
       - "3000:3000"
@@ -125,7 +125,7 @@ services:
     restart: unless-stopped
 
   cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
+    image: gcr.io/cadvisor/cadvisor:v0.53.0
     container_name: cadvisor
     volumes:
       - /:/rootfs:ro
@@ -140,6 +140,34 @@ services:
       - monitoring
     restart: unless-stopped
 
+  victorialogs:
+    image: victoriametrics/victoria-logs:v1.37.2-victorialogs
+    container_name: victorialogs
+    ports:
+      - "9428:9428"
+    volumes:
+      - vl_data:/victoria-logs-data
+    command:
+      - "-storageDataPath=/victoria-logs-data"
+      - "-httpListenAddr=:9428"
+      - "-retentionPeriod=12" # 12 months retention
+    networks:
+      - monitoring
+      - traefik
+    restart: unless-stopped
+
+  vector:
+    image: timberio/vector:0.51.1-alpine
+    container_name: vector
+    volumes:
+      - ./configs/vector.toml:/etc/vector/vector.toml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - monitoring
+    restart: unless-stopped
+    depends_on:
+      - victorialogs
+
 networks:
   monitoring:
     driver: bridge
@@ -150,4 +178,6 @@ volumes:
   vm_data:
     driver: local
   grafana_data:
+    driver: local
+  vl_data:
     driver: local

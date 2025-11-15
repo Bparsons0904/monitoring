@@ -1,0 +1,66 @@
+# Vector configuration for collecting Docker container logs
+# and sending them to VictoriaLogs
+
+# Source: Collect logs from Docker containers
+[sources.docker_logs]
+type = "docker_logs"
+# Include all containers by default
+include_containers = []
+# Exclude the vector container itself to avoid log loops
+exclude_containers = ["vector"]
+
+# Transform: Add useful metadata and parse JSON logs
+[transforms.parse_logs]
+type = "remap"
+inputs = ["docker_logs"]
+source = '''
+  # Add timestamp if not present
+  if !exists(.timestamp) {
+    .timestamp = now()
+  }
+
+  # Try to parse JSON logs
+  if is_string(.message) {
+    parsed, err = parse_json(.message)
+    if err == null {
+      . = merge(., parsed)
+    }
+  }
+
+  # Extract container labels as structured data
+  .container_name = .container_name
+  .container_id = .container_id
+  .image = .image
+
+  # Add a _stream_fields for VictoriaLogs to optimize querying
+  ._stream_fields = "container_name,image"
+'''
+
+# Sink: Send logs to VictoriaLogs
+[sinks.victorialogs]
+type = "http"
+inputs = ["parse_logs"]
+uri = "http://victorialogs:9428/insert/jsonline"
+encoding.codec = "json"
+compression = "gzip"
+
+# Batch settings for efficient ingestion
+[sinks.victorialogs.batch]
+max_bytes = 1048576  # 1MB
+timeout_secs = 5
+
+# Buffer settings
+[sinks.victorialogs.buffer]
+type = "memory"
+max_events = 10000
+
+# Request settings
+[sinks.victorialogs.request]
+retry_attempts = 3
+retry_initial_backoff_secs = 1
+retry_max_duration_secs = 10
+timeout_secs = 30
+
+# Health check
+[sinks.victorialogs.healthcheck]
+enabled = true

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This is a Docker-based monitoring stack using VictoriaMetrics, Grafana, and Node Exporter. The infrastructure is deployed via Docker Compose with Traefik reverse proxy integration and automated CI/CD using Drone.
+This is a Docker-based monitoring stack using VictoriaMetrics, VictoriaLogs, Grafana, and Node Exporter. The infrastructure is deployed via Docker Compose with Traefik reverse proxy integration and automated CI/CD using Drone.
 
 ## Common Commands
 
@@ -21,8 +21,10 @@ docker compose logs -f
 
 # View logs for specific service
 docker compose logs -f victoriametrics
+docker compose logs -f victorialogs
 docker compose logs -f grafana
 docker compose logs -f vmauth
+docker compose logs -f vector
 
 # Update and restart services
 docker compose pull && docker compose up -d
@@ -62,6 +64,8 @@ crontab -l | grep -E 'ssh_metrics|smart_metrics'
 
 ### Service Stack
 - **VictoriaMetrics**: Time series database for metrics storage with 12-month retention
+- **VictoriaLogs**: Log database for storing Docker container logs with 12-month retention
+- **Vector**: Log collector that gathers logs from all Docker containers and sends to VictoriaLogs
 - **VMAuth**: Authentication proxy for VictoriaMetrics with configurable user access
 - **Grafana**: Visualization dashboard with admin authentication
 - **Node Exporter**: System metrics collection with textfile collector for custom metrics
@@ -78,10 +82,12 @@ crontab -l | grep -E 'ssh_metrics|smart_metrics'
 
 ### Data Persistence
 - VictoriaMetrics data: `vm_data` volume
+- VictoriaLogs data: `vl_data` volume
 - Grafana configuration: `grafana_data` volume
 - External configuration mounting from `./configs/` directory
 - Custom metrics: `./textfiles/` directory for Node Exporter textfile collector
 - Container metrics: cAdvisor provides real-time Docker container statistics
+- Container logs: Vector collects from Docker socket and sends to VictoriaLogs
 
 ## Configuration Management
 
@@ -95,6 +101,7 @@ Set in `.env` file based on `.env.example`:
 
 ### Configuration Files
 - `configs/vmauth-config.yml`: VMAuth user authentication and routing configuration
+- `configs/vector.toml`: Vector log collection and processing configuration
 - `configs/grafana/provisioning/`: Grafana dashboards and datasources (configuration-as-code)
 - `docker-compose.yml`: Service definitions and networking
 - `scripts/ssh_metrics.sh`: SSH login tracking script for security monitoring
@@ -160,11 +167,226 @@ docker compose up -d
 - Custom metrics stored in `textfiles/` directory for Node Exporter textfile collector
 - Add new metric scripts following the same pattern as `ssh_metrics.sh`
 
+### Log Management with VictoriaLogs
+VictoriaLogs collects logs from all Docker containers via Vector and provides a Loki-compatible API for querying in Grafana.
+
+**Log Collection**:
+- Vector automatically collects logs from all running Docker containers
+- Logs are parsed and enriched with metadata (container name, image, labels)
+- Logs are sent to VictoriaLogs with compression for efficient storage
+- Vector excludes itself from log collection to avoid infinite loops
+
+**Querying Logs in Grafana**:
+1. Select "VictoriaLogs" as the datasource in Grafana
+2. Use LogQL syntax (Loki-compatible) for queries
+3. Example queries:
+   ```
+   {container_name="victoriametrics"}
+   {container_name="grafana"} |= "error"
+   {image=~"victoriametrics/.*"}
+   ```
+
+**Vector Configuration**:
+- Configuration file: `configs/vector.toml`
+- Logs are batched (max 1MB or 5 seconds) for efficiency
+- Automatic retry with exponential backoff on failures
+- JSON log parsing with automatic detection
+
+**VictoriaLogs Access**:
+- Direct API: `http://victorialogs:9428` (internal only)
+- Loki API endpoint: `http://victorialogs:9428/select/logsql/loki_api/v1`
+- 12-month retention period matching VictoriaMetrics
+
 ### Monitoring Access
 - Grafana: `https://grafana.bobparsons.dev` (SSL via Traefik/Let's Encrypt)
 - VictoriaMetrics: `https://metrics.bobparsons.dev` (VMAuth proxy with authentication)
 - Node Exporter: Internal metrics collection on port 9100 (monitoring network only)
 - MCP VictoriaMetrics: Internal service on port 8080 (monitoring network only)
+
+## Version Management
+
+### Current Service Versions
+All Docker images use pinned versions for production stability and reproducibility.
+
+**Last Updated**: 2025-11-15
+
+| Service | Image | Version | Release Date | Notes |
+|---------|-------|---------|--------------|-------|
+| VMAuth | victoriametrics/vmauth | v1.129.1 | 2025-11-04 | Security fixes for maxDataSize, snappy encoding |
+| VictoriaMetrics | victoriametrics/victoria-metrics | v1.129.1 | 2025-11-04 | Latest stable, AWS S3 env var fix |
+| VictoriaLogs | victoriametrics/victoria-logs | v1.37.2-victorialogs | 2025-11-xx | Latest stable logs database |
+| Grafana | grafana/grafana | 12.2.1 | 2025-10-21 | Latest stable, AngularJS removed in v12 |
+| Node Exporter | prom/node-exporter | v1.10.2 | 2025-10-25 | Zswap metric name typo fix |
+| cAdvisor | gcr.io/cadvisor/cadvisor | v0.53.0 | 2025-06-05 | Containerd LoadContainer hang fix |
+| Vector | timberio/vector | 0.51.1-alpine | 2025-11-13 | Rate limiting bug fixes |
+| MCP VictoriaMetrics | ghcr.io/victoriametrics-community/mcp-victoriametrics | v1.16.1 | 2025-11-03 | Latest stable MCP server |
+
+### Version Selection Strategy
+- **Production Stability**: Pinned to specific versions (no `latest` tags)
+- **VictoriaMetrics**: Using latest stable (v1.129.1) for recent security fixes
+  - LTS option available: v1.122.8 with 12-month support
+- **Update Cadence**: Monthly review recommended, quarterly updates for stable services
+- **Testing**: Always test updates in development environment first
+
+### Important Compatibility Notes
+- **VictoriaMetrics v1.129.x**: No breaking config changes from v1.122.x LTS
+- **Grafana 12.x**: AngularJS support removed - verify custom plugins compatibility
+- **Vector 0.51.x**: Environment variables with newlines now rejected (security)
+- **VictoriaLogs**: Cluster version available for linear scaling (not yet implemented)
+
+### Version Update Maintenance
+
+**Update Schedule**: Review monthly, update quarterly (or as needed for security fixes)
+
+#### Pre-Update Checklist
+Before updating any service version:
+
+1. **Backup Current State**
+   ```bash
+   # Backup docker volumes
+   docker run --rm -v monitoring_vm_data:/data -v $(pwd)/backups:/backup alpine tar czf /backup/vm_data_$(date +%Y%m%d).tar.gz -C /data .
+   docker run --rm -v monitoring_vl_data:/data -v $(pwd)/backups:/backup alpine tar czf /backup/vl_data_$(date +%Y%m%d).tar.gz -C /data .
+   docker run --rm -v monitoring_grafana_data:/data -v $(pwd)/backups:/backup alpine tar czf /backup/grafana_data_$(date +%Y%m%d).tar.gz -C /data .
+
+   # Backup configurations
+   cp -r configs configs.backup.$(date +%Y%m%d)
+   ```
+
+2. **Review Release Notes**
+   - VictoriaMetrics: https://github.com/VictoriaMetrics/VictoriaMetrics/releases
+   - VictoriaLogs: https://github.com/VictoriaMetrics/VictoriaMetrics/releases (same repo)
+   - Grafana: https://github.com/grafana/grafana/releases
+   - Node Exporter: https://github.com/prometheus/node_exporter/releases
+   - cAdvisor: https://github.com/google/cadvisor/releases
+   - Vector: https://github.com/vectordotdev/vector/releases
+   - MCP VictoriaMetrics: https://github.com/VictoriaMetrics/mcp-victoriametrics/releases
+
+3. **Check Breaking Changes**
+   - Review CHANGELOG or release notes for "BREAKING" changes
+   - Verify configuration compatibility
+   - Check API compatibility (especially for Grafana datasources)
+
+4. **Plan Rollback Strategy**
+   - Document current version
+   - Know how to revert docker-compose.yml
+   - Understand data migration implications (if any)
+
+#### Update Procedure
+
+**One service at a time** to isolate issues:
+
+1. **Update docker-compose.yml**
+   ```bash
+   # Edit docker-compose.yml to change version tag
+   # Example: victoriametrics/victoria-metrics:v1.129.1 → v1.130.0
+   ```
+
+2. **Pull New Image**
+   ```bash
+   docker compose pull <service-name>
+   ```
+
+3. **Stop and Update Service**
+   ```bash
+   docker compose up -d <service-name>
+   ```
+
+4. **Verify Service Health**
+   ```bash
+   # Check service started successfully
+   docker compose ps <service-name>
+
+   # Check logs for errors
+   docker compose logs -f <service-name>
+
+   # Verify metrics/logs still flowing
+   # - Check Grafana dashboards
+   # - Query VictoriaMetrics API
+   # - Verify VictoriaLogs receiving logs
+   ```
+
+5. **Test Critical Functionality**
+   - VictoriaMetrics: Query recent metrics, verify scrape targets
+   - VictoriaLogs: Query recent logs, verify Vector ingestion
+   - Grafana: Load dashboards, test datasources, verify alerts
+   - Node Exporter: Check textfile collector metrics
+   - cAdvisor: Verify container metrics available
+
+6. **Commit Version Change**
+   ```bash
+   git add docker-compose.yml
+   git commit -m "Update <service> from v<old> to v<new>
+
+   Release notes: <link>
+   Breaking changes: <none|description>
+   Tested: <what you verified>"
+   ```
+
+7. **Update Version Table**
+   - Update the version table in this CLAUDE.md file
+   - Update "Last Updated" date
+   - Add any new compatibility notes
+
+#### Rollback Procedure
+
+If update causes issues:
+
+1. **Revert docker-compose.yml**
+   ```bash
+   git checkout HEAD~1 docker-compose.yml
+   ```
+
+2. **Restart Service with Old Version**
+   ```bash
+   docker compose pull <service-name>
+   docker compose up -d <service-name>
+   ```
+
+3. **Restore Data if Needed**
+   ```bash
+   # Stop service first
+   docker compose stop <service-name>
+
+   # Restore volume from backup
+   docker run --rm -v monitoring_vm_data:/data -v $(pwd)/backups:/backup alpine tar xzf /backup/vm_data_YYYYMMDD.tar.gz -C /data
+
+   # Restart service
+   docker compose up -d <service-name>
+   ```
+
+#### Special Update Notes
+
+**VictoriaMetrics/VMAuth**:
+- Can be updated together (same release cycle)
+- Check for config syntax changes in vmauth-config.yml
+- Verify scrape config compatibility
+
+**Grafana**:
+- Major version updates (11.x → 12.x) may break plugins
+- Run `docker exec grafana grafana cli plugins update-all` after update
+- Test all dashboards and datasources after update
+- Check for deprecated features in release notes
+
+**Vector**:
+- Pre-1.0 software - minor versions can have breaking changes
+- Always read CHANGELOG before updating
+- Test configuration with `docker run --rm -v $(pwd)/configs/vector.toml:/etc/vector/vector.toml timberio/vector:NEW_VERSION validate /etc/vector/vector.toml`
+
+**Node Exporter/cAdvisor**:
+- Stable, rarely breaking changes
+- Safe to update to latest stable
+
+#### Monitoring Version Updates
+
+Use these commands to check for available updates:
+
+```bash
+# Check current versions
+grep "image:" docker-compose.yml | grep -v "#"
+
+# Check latest versions (requires internet)
+# See scripts/check-updates.sh for automated checking
+```
 
 ## Security Considerations
 
