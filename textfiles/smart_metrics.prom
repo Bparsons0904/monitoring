@@ -1,4 +1,4 @@
-# SMART metrics collected at Sat Aug 16 10:20:01 PM CDT 2025
+# SMART metrics collected at Sat Nov 15 06:20:01 AM CST 2025
 # HELP smart_device_health SMART health status (1=healthy, 0=failing)
 # TYPE smart_device_health gauge
 # HELP smart_device_temperature_celsius Current temperature in Celsius
@@ -17,18 +17,18 @@
 # TYPE smart_metrics_last_updated_timestamp gauge
 
 smart_device_health{device="nvme0n1"} 1
-smart_device_temperature_celsius{device="nvme0n1"} 41
-smart_device_power_on_hours_total{device="nvme0n1"} 558
-smart_device_power_cycles_total{device="nvme0n1"} 6
+smart_device_temperature_celsius{device="nvme0n1"} 38
+smart_device_power_on_hours_total{device="nvme0n1"} 2575
+smart_device_power_cycles_total{device="nvme0n1"} 7
 smart_device_data_written_total{device="nvme0n1"} 0
 smart_device_spare_percent{device="nvme0n1"} 100
 smart_device_used_percent{device="nvme0n1"} 0
 smart_device_health{device="nvme1n1"} 1
-smart_device_temperature_celsius{device="nvme1n1"} 40
-smart_device_power_on_hours_total{device="nvme1n1"} 450
-smart_device_power_cycles_total{device="nvme1n1"} 6
+smart_device_temperature_celsius{device="nvme1n1"} 38
+smart_device_power_on_hours_total{device="nvme1n1"} 2480
+smart_device_power_cycles_total{device="nvme1n1"} 7
 smart_device_data_written_total{device="nvme1n1"} 0
 smart_device_spare_percent{device="nvme1n1"} 100
 smart_device_used_percent{device="nvme1n1"} 0
 
-smart_metrics_last_updated_timestamp 1755400801
+smart_metrics_last_updated_timestamp 1763209201
