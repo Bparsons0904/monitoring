@@ -4,8 +4,7 @@
 # Source: Collect logs from Docker containers
 [sources.docker_logs]
 type = "docker_logs"
-# Include all containers by default
-include_containers = []
+# Include all containers by default (omit include_containers to collect all)
 # Exclude the vector container itself to avoid log loops
 exclude_containers = ["vector"]
 
@@ -22,8 +21,8 @@ source = '''
   # Try to parse JSON logs
   if is_string(.message) {
     parsed, err = parse_json(.message)
-    if err == null {
-      . = merge(., parsed)
+    if err == null && is_object(parsed) {
+      ., merge_err = merge(., parsed)
     }
   }
 
@@ -34,6 +33,9 @@ source = '''
 
   # Add a _stream_fields for VictoriaLogs to optimize querying
   ._stream_fields = "container_name,image"
+
+  # VictoriaLogs requires _msg field instead of message
+  ._msg = del(.message)
 '''
 
 # Sink: Send logs to VictoriaLogs
@@ -42,6 +44,7 @@ type = "http"
 inputs = ["parse_logs"]
 uri = "http://victorialogs:9428/insert/jsonline"
 encoding.codec = "json"
+framing.method = "newline_delimited"
 compression = "gzip"
 
 # Batch settings for efficient ingestion
