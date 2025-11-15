@@ -41,33 +41,6 @@ services:
       - traefik
     restart: unless-stopped
 
-  mcp-victoriametrics:
-    image: ghcr.io/victoriametrics-community/mcp-victoriametrics:v1.16.1
-    container_name: mcp-victoriametrics
-    environment:
-      # MCP_SERVER_MODE: Set to 'sse' for Server-Sent Events, or 'ws' for WebSockets.
-      # SSE is generally simpler for dashboards.
-      - MCP_SERVER_MODE=sse
-      # VM_INSTANCE_ENTRYPOINT: This is crucial. Since 'victoriametrics' service
-      # is on the same Docker network, use its service name and port.
-      - VM_INSTANCE_ENTRYPOINT=http://victoriametrics:8428
-      # VM_INSTANCE_TYPE: Set based on your VictoriaMetrics setup (single, cluster, etc.)
-      - VM_INSTANCE_TYPE=single # or 'cluster' if you have a cluster setup
-      # MCP_SERVER_BIND_ADDR: Port for MCP server to listen on inside the container.
-      - MCP_SERVER_BIND_ADDR=:8080 # Default is usually 8080
-      # Authentication credentials for VictoriaMetrics
-      - VM_AUTH_USERNAME=${VM_AUTH_USERNAME}
-      - VM_AUTH_PASSWORD=${VM_AUTH_PASSWORD}
-      - VM_BEARER_TOKEN=${VM_BEARER_TOKEN}
-    ports:
-      # Map container port 8080 to host port (e.g., 8080 or another available port)
-      - "8080:8080" # You can change the host port (e.g., "9090:8080")
-    networks:
-      - monitoring # Essential for communication with 'victoriametrics'
-    restart: unless-stopped
-    depends_on:
-      - victoriametrics # Ensures VictoriaMetrics starts before MCP
-
   node-exporter:
     image: prom/node-exporter:v1.10.2
     container_name: node-exporter

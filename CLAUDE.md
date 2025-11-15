@@ -70,8 +70,6 @@ crontab -l | grep -E 'ssh_metrics|smart_metrics'
 - **Grafana**: Visualization dashboard with admin authentication
 - **Node Exporter**: System metrics collection with textfile collector for custom metrics
 - **cAdvisor**: Docker container metrics collection (CPU, memory, network, disk I/O)
-- **MCP VictoriaMetrics**: Model Context Protocol server for VictoriaMetrics integration with Claude Code
-- **MCP Grafana**: Model Context Protocol server for Grafana integration with Claude Code
 
 ### Network Architecture
 - **Internal Network**: `monitoring` network for service-to-service communication
@@ -95,7 +93,6 @@ crontab -l | grep -E 'ssh_metrics|smart_metrics'
 Set in `.env` file based on `.env.example`:
 - `GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD`: Grafana admin credentials
 - `VM_AUTH_USERNAME` / `VM_AUTH_PASSWORD`: VictoriaMetrics authentication
-- `VM_BEARER_TOKEN`: Bearer token for VictoriaMetrics MCP authentication
 
 **Important**: VMAuth uses `%{ENV_VAR}` syntax for environment variable substitution in config files, not `${ENV_VAR}`.
 
@@ -123,7 +120,6 @@ docker compose ps
 Environment variables are managed through `.env` file:
 - `GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD`: Grafana admin credentials (use strong passwords)
 - `VM_AUTH_USERNAME` / `VM_AUTH_PASSWORD`: VictoriaMetrics authentication (use strong passwords)
-- `VM_BEARER_TOKEN`: VictoriaMetrics MCP bearer token (generated with `openssl rand -base64 32`)
 
 **Reset Grafana Admin User**: If you change credentials in `.env`, you must reset Grafana's database:
 ```bash
@@ -201,7 +197,6 @@ VictoriaLogs collects logs from all Docker containers via Vector and provides a 
 - Grafana: `https://grafana.bobparsons.dev` (SSL via Traefik/Let's Encrypt)
 - VictoriaMetrics: `https://metrics.bobparsons.dev` (VMAuth proxy with authentication)
 - Node Exporter: Internal metrics collection on port 9100 (monitoring network only)
-- MCP VictoriaMetrics: Internal service on port 8080 (monitoring network only)
 
 ## Version Management
 
@@ -219,7 +214,6 @@ All Docker images use pinned versions for production stability and reproducibili
 | Node Exporter | prom/node-exporter | v1.10.2 | 2025-10-25 | Zswap metric name typo fix |
 | cAdvisor | gcr.io/cadvisor/cadvisor | v0.53.0 | 2025-06-05 | Containerd LoadContainer hang fix |
 | Vector | timberio/vector | 0.51.1-alpine | 2025-11-13 | Rate limiting bug fixes |
-| MCP VictoriaMetrics | ghcr.io/victoriametrics-community/mcp-victoriametrics | v1.16.1 | 2025-11-03 | Latest stable MCP server |
 
 ### Version Selection Strategy
 - **Production Stability**: Pinned to specific versions (no `latest` tags)
@@ -394,6 +388,45 @@ grep "image:" docker-compose.yml | grep -v "#"
 - SSL termination handled by Traefik with Let's Encrypt certificates
 - Sensitive credentials managed through environment variables and CI/CD secrets
 - Docker socket mounted read-only for container metrics collection
+
+## Development Tools
+
+### MCP (Model Context Protocol) - Optional
+MCP servers allow AI tools like Claude Code to query VictoriaMetrics directly during development/debugging sessions.
+
+**Important**: MCP servers are **development tools only** and should **NOT** be run in production docker-compose.yml.
+
+**Why MCP was removed from production:**
+- Security risk: Exposes query capabilities without production authentication
+- Resource waste: Runs 24/7 when only needed occasionally
+- Development tool: Not production infrastructure
+- Unnecessary complexity: Additional service to maintain
+
+**If you need MCP for development:**
+
+1. **Run as standalone container when needed:**
+   ```bash
+   docker run --rm -it \
+     --network monitoring \
+     -p 8080:8080 \
+     -e MCP_SERVER_MODE=sse \
+     -e VM_INSTANCE_ENTRYPOINT=http://victoriametrics:8428 \
+     -e VM_INSTANCE_TYPE=single \
+     ghcr.io/victoriametrics-community/mcp-victoriametrics:v1.16.1
+   ```
+
+2. **Or configure in Claude Code MCP settings** (`~/.claude/mcp-settings.json`)
+   - This is the recommended approach for local development
+   - MCP server runs only when Claude Code needs it
+   - No production infrastructure impact
+
+3. **Stop when done:**
+   ```bash
+   docker stop <container-id>
+   ```
+
+**Grafana MCP:**
+Similar approach - use Grafana MCP tools on-demand for development, not in production stack.
 
 ## Troubleshooting
 
