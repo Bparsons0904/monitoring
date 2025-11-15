@@ -4,6 +4,13 @@
 # Docker volumes
 vm_data/
 grafana_data/
+vl_data/
+
+# Generated metrics files (textfile collector)
+textfiles/*.prom
+
+# Backups
+backups/
 
 # Logs
 *.log
