@@ -13,9 +13,9 @@ datasources:
     version: 1
 
   - name: VictoriaLogs
-    type: loki
+    type: victoriametrics-logs-datasource
     access: proxy
-    url: http://victorialogs:9428/select/logsql/loki_api/v1
+    url: http://victorialogs:9428
     editable: true
     jsonData:
       maxLines: 1000

@@ -595,6 +595,100 @@
         }
       },
       "gridPos": {"h": 8, "w": 24, "x": 0, "y": 32}
+    },
+    {
+      "id": 12,
+      "title": "Storage Usage Timeline",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "(node_filesystem_size_bytes{mountpoint=\"/volume1\",job=\"nas-node-exporter\"} - node_filesystem_avail_bytes{mountpoint=\"/volume1\",job=\"nas-node-exporter\"}) / 1024^4",
+          "legendFormat": "Used TB"
+        },
+        {
+          "expr": "node_filesystem_avail_bytes{mountpoint=\"/volume1\",job=\"nas-node-exporter\"} / 1024^4",
+          "legendFormat": "Available TB"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "TB",
+          "min": 0,
+          "decimals": 2,
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "fillOpacity": 20,
+            "gradientMode": "opacity",
+            "spanNulls": false,
+            "insertNulls": false,
+            "showPoints": "never",
+            "pointSize": 5,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisPlacement": "auto",
+            "axisLabel": "",
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "vis": false
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Used TB"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Available TB"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "tooltip": {
+          "mode": "multi",
+          "sort": "none"
+        },
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["lastNotNull", "min", "max", "mean"]
+        }
+      },
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 40}
     }
   ],
   "time": {
