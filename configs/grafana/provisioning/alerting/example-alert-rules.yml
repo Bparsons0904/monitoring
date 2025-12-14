@@ -1,0 +1,261 @@
+# Grafana Alert Rules Configuration
+# This file shows examples of how to configure alerts with improved notifications
+#
+# To use these examples:
+# 1. Copy this file and modify for your specific alerts
+# 2. Update the dashboard URLs to match your actual dashboard UIDs
+# 3. Restart Grafana to apply: docker compose restart grafana
+
+apiVersion: 1
+
+groups:
+  - name: System Health Alerts
+    interval: 1m
+    rules:
+      # Example 1: High CPU Usage Alert
+      - uid: high_cpu_usage
+        title: High CPU Usage
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: victoriametrics  # Update to match your datasource UID
+            model:
+              expr: avg(rate(node_cpu_seconds_total{mode!="idle"}[5m])) by (instance) * 100
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: classic_conditions
+              refId: B
+              conditions:
+                - evaluator:
+                    params:
+                      - 80
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  type: query
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: CPU usage above 80% on {{ $labels.instance }}
+          description: |
+            The CPU usage on {{ $labels.instance }} has been above 80% for 5 minutes.
+            Current value: {{ $values.A.Value | printf "%.2f" }}%
+
+            This could indicate:
+            - High system load
+            - Resource-intensive process
+            - Potential performance issues
+          # IMPORTANT: Update this URL with your actual dashboard URL
+          dashboard_url: https://grafana.bobparsons.dev/d/YOUR_DASHBOARD_UID/server-metrics?var-instance={{ $labels.instance }}
+        labels:
+          severity: warning
+          team: infrastructure
+
+      # Example 2: High Memory Usage Alert
+      - uid: high_memory_usage
+        title: High Memory Usage
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: victoriametrics
+            model:
+              expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: classic_conditions
+              refId: B
+              conditions:
+                - evaluator:
+                    params:
+                      - 85
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  type: query
+        noDataState: NoData
+        execErrState: Error
+        for: 5m
+        annotations:
+          summary: Memory usage above 85% on {{ $labels.instance }}
+          description: |
+            Memory usage on {{ $labels.instance }} is critically high.
+            Current usage: {{ $values.A.Value | printf "%.2f" }}%
+
+            Action required:
+            - Check for memory leaks
+            - Review running processes
+            - Consider scaling up resources
+          dashboard_url: https://grafana.bobparsons.dev/d/YOUR_DASHBOARD_UID/server-metrics?var-instance={{ $labels.instance }}
+        labels:
+          severity: critical
+          team: infrastructure
+
+      # Example 3: Disk Space Alert
+      - uid: low_disk_space
+        title: Low Disk Space
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: victoriametrics
+            model:
+              expr: (1 - (node_filesystem_avail_bytes{fstype!~"tmpfs|ramfs"} / node_filesystem_size_bytes{fstype!~"tmpfs|ramfs"})) * 100
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: classic_conditions
+              refId: B
+              conditions:
+                - evaluator:
+                    params:
+                      - 85
+                    type: gt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  type: query
+        noDataState: NoData
+        execErrState: Error
+        for: 10m
+        annotations:
+          summary: Disk space low on {{ $labels.instance }} - {{ $labels.mountpoint }}
+          description: |
+            Disk usage on {{ $labels.mountpoint }} ({{ $labels.instance }}) is above 85%.
+            Current usage: {{ $values.A.Value | printf "%.2f" }}%
+
+            Immediate actions:
+            - Clean up old logs
+            - Remove unused files
+            - Check for large files
+            - Plan capacity upgrade if needed
+          dashboard_url: https://grafana.bobparsons.dev/d/YOUR_DASHBOARD_UID/server-metrics?var-instance={{ $labels.instance }}
+        labels:
+          severity: warning
+          team: infrastructure
+
+      # Example 4: Service Down Alert
+      - uid: service_down
+        title: Service Down
+        condition: B
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 60
+              to: 0
+            datasourceUid: victoriametrics
+            model:
+              expr: up{job!=""}
+              refId: A
+          - refId: B
+            relativeTimeRange:
+              from: 60
+              to: 0
+            datasourceUid: __expr__
+            model:
+              type: classic_conditions
+              refId: B
+              conditions:
+                - evaluator:
+                    params:
+                      - 1
+                    type: lt
+                  operator:
+                    type: and
+                  query:
+                    params:
+                      - A
+                  type: query
+        noDataState: Alerting
+        execErrState: Error
+        for: 1m
+        annotations:
+          summary: Service {{ $labels.job }} is down on {{ $labels.instance }}
+          description: |
+            The service {{ $labels.job }} on {{ $labels.instance }} is not responding.
+
+            Status: DOWN
+            Last seen: {{ $values.A.Value }}
+
+            Critical action required:
+            - Check service status
+            - Review service logs
+            - Restart service if necessary
+            - Investigate root cause
+          dashboard_url: https://grafana.bobparsons.dev/d/YOUR_DASHBOARD_UID/server-metrics?var-instance={{ $labels.instance }}
+        labels:
+          severity: critical
+          team: infrastructure
+          oncall: "true"
+
+---
+# Contact Points Configuration
+# Define where alerts should be sent
+
+# Note: Replace with your actual notification channel configuration
+# Examples for different notification types:
+
+# Email Example:
+# contactPoints:
+#   - name: email-team
+#     type: email
+#     settings:
+#       addresses: team@example.com
+#     disableResolveMessage: false
+
+# Slack Example:
+# contactPoints:
+#   - name: slack-alerts
+#     type: slack
+#     settings:
+#       url: https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+#       title: '{{ template "improved_alert_template" . }}'
+#     disableResolveMessage: false
+
+# Discord Example:
+# contactPoints:
+#   - name: discord-alerts
+#     type: discord
+#     settings:
+#       url: https://discord.com/api/webhooks/YOUR/WEBHOOK/URL
+#       message: '{{ template "improved_alert_template" . }}'
+#     disableResolveMessage: false
+
+# Webhook Example:
+# contactPoints:
+#   - name: webhook-alerts
+#     type: webhook
+#     settings:
+#       url: https://your-webhook-url.com/alerts
+#       httpMethod: POST
+#     disableResolveMessage: false

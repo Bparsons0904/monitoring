@@ -1,0 +1,112 @@
+# Grafana Alert Notification Template Configuration
+# This file defines custom notification templates for clearer alert messages
+#
+# Template variables available:
+# - {{ .Status }} - firing, resolved
+# - {{ .CommonLabels.alertname }} - name of the alert
+# - {{ .CommonAnnotations.summary }} - alert summary
+# - {{ .CommonAnnotations.description }} - alert description
+# - {{ .ExternalURL }} - Grafana instance URL
+# - {{ .Alerts }} - list of all alerts in this notification
+
+apiVersion: 1
+
+templates:
+  - name: improved_alert_template
+    template: |
+      🚨 **ALERT {{ if eq .Status "firing" }}FIRING{{ else }}RESOLVED{{ end }}**
+
+      **Problem:** {{ .CommonAnnotations.summary }}
+      {{ if .CommonAnnotations.description }}
+      **Details:** {{ .CommonAnnotations.description }}
+      {{ end }}
+
+      **Alert:** {{ .CommonLabels.alertname }}
+      **Severity:** {{ .CommonLabels.severity | default "unknown" }}
+      **Status:** {{ .Status }}
+
+      📊 **Links:**
+      {{- if .CommonAnnotations.dashboard_url }}
+      • Dashboard: {{ .CommonAnnotations.dashboard_url }}
+      {{- end }}
+      • Alert Rule: {{ .ExternalURL }}/alerting/list
+      • Grafana: {{ .ExternalURL }}
+
+      **Affected Resources:**
+      {{- range .Alerts }}
+      {{- if .Labels.instance }}
+      • Instance: {{ .Labels.instance }}{{ end }}
+      {{- if .Labels.job }}
+      • Job: {{ .Labels.job }}{{ end }}
+      {{- if .Labels.container }}
+      • Container: {{ .Labels.container }}{{ end }}
+      {{- end }}
+
+      **Timestamp:** {{ .StartsAt.Format "2006-01-02 15:04:05 MST" }}
+      {{ if eq .Status "resolved" }}
+      **Resolved at:** {{ .EndsAt.Format "2006-01-02 15:04:05 MST" }}
+      {{ end }}
+
+  - name: email_alert_template
+    template: |
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .alert-box { border-left: 4px solid {{ if eq .Status "firing" }}#d32f2f{{ else }}#388e3c{{ end }}; padding: 15px; margin: 20px 0; background: #f5f5f5; }
+          .alert-header { font-size: 24px; font-weight: bold; color: {{ if eq .Status "firing" }}#d32f2f{{ else }}#388e3c{{ end }}; margin-bottom: 10px; }
+          .alert-details { margin: 10px 0; }
+          .alert-details strong { color: #555; }
+          .links { margin: 15px 0; }
+          .links a { color: #1976d2; text-decoration: none; padding: 8px 12px; background: #e3f2fd; border-radius: 4px; display: inline-block; margin: 5px 5px 5px 0; }
+          .resources { background: white; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        </style>
+      </head>
+      <body>
+        <div class="alert-box">
+          <div class="alert-header">
+            {{ if eq .Status "firing" }}🚨 ALERT FIRING{{ else }}✅ ALERT RESOLVED{{ end }}
+          </div>
+
+          <div class="alert-details">
+            <p><strong>Problem:</strong> {{ .CommonAnnotations.summary }}</p>
+            {{ if .CommonAnnotations.description }}
+            <p><strong>Details:</strong> {{ .CommonAnnotations.description }}</p>
+            {{ end }}
+
+            <p><strong>Alert Name:</strong> {{ .CommonLabels.alertname }}</p>
+            <p><strong>Severity:</strong> {{ .CommonLabels.severity | default "unknown" }}</p>
+            <p><strong>Status:</strong> {{ .Status }}</p>
+            <p><strong>Time:</strong> {{ .StartsAt.Format "2006-01-02 15:04:05 MST" }}</p>
+            {{ if eq .Status "resolved" }}
+            <p><strong>Resolved:</strong> {{ .EndsAt.Format "2006-01-02 15:04:05 MST" }}</p>
+            {{ end }}
+          </div>
+
+          <div class="links">
+            <strong>Quick Links:</strong><br>
+            {{- if .CommonAnnotations.dashboard_url }}
+            <a href="{{ .CommonAnnotations.dashboard_url }}">📊 View Dashboard</a>
+            {{- end }}
+            <a href="{{ .ExternalURL }}/alerting/list">🔔 Alert Rules</a>
+            <a href="{{ .ExternalURL }}">🏠 Grafana Home</a>
+          </div>
+
+          {{- if .Alerts }}
+          <div class="resources">
+            <strong>Affected Resources:</strong>
+            <ul>
+            {{- range .Alerts }}
+              <li>
+              {{- if .Labels.instance }}Instance: {{ .Labels.instance }} | {{ end }}
+              {{- if .Labels.job }}Job: {{ .Labels.job }} | {{ end }}
+              {{- if .Labels.container }}Container: {{ .Labels.container }}{{ end }}
+              </li>
+            {{- end }}
+            </ul>
+          </div>
+          {{- end }}
+        </div>
+      </body>
+      </html>

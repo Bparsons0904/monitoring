@@ -68,9 +68,3 @@ scrape_configs:
     scrape_interval: 15s
     metrics_path: /metrics
 
-  # Technitium DNS Server metrics
-  - job_name: "technitium-dns"
-    static_configs:
-      - targets: ["technitium-exporter:4001"]
-    scrape_interval: 15s
-    metrics_path: /metrics
