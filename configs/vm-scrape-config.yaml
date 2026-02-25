@@ -68,3 +68,8 @@ scrape_configs:
     scrape_interval: 15s
     metrics_path: /metrics
 
+  - job_name: "valkey-exporter"
+    static_configs:
+      - targets: ["valkey-exporter:9121"]
+    scrape_interval: 15s
+
